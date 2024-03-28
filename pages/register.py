@@ -1,0 +1,14 @@
+import dash
+from dash import html
+
+dash.register_page(
+    __name__,
+    path='/register',
+    title='Register page',
+    name='Register page'
+)
+
+layout = html.Div([
+    html.H1('This is our Register page'),
+    html.Div('This is our Register page content.'),
+])
