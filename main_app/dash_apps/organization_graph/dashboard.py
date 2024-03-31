@@ -23,6 +23,7 @@ def init_dashboard(server):
     # Create Dash Layout
     dash_app.layout = dcc.Loading(
         [
+            html.A('Home', href='/'),
             html.H1('Visual Organizational Structure'),
             dash.page_container
         ], 
