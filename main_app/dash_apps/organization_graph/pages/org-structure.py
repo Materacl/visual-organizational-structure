@@ -4,7 +4,7 @@ import dash_cytoscape as cyto
 
 dash.register_page(
     __name__,
-    path='/org-structure',
+    path='/',
     title='org-structure page',
     name='org-structure page'
 )

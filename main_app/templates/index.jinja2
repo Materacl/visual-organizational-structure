@@ -1,0 +1,9 @@
+{% extends "layout.jinja2" %}
+{% block title %}<title>Главная страница</title>{% endblock %}
+{% block content %}
+    <h1 class="site-title">{{ title }}</h1>
+    <a href="/dashboard/" class="dash-link">
+    <span>Embedded Plotly Dash</span>
+    <i class="fas fa-arrow-right"></i>
+    </a>
+{% endblock %}
