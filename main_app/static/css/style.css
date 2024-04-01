@@ -1,0 +1,173 @@
+/*body*/
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x:hidden;
+
+}
+
+
+/*header*/
+header {
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.logo {
+    margin-right: 30px;
+}
+
+
+.menu {
+    flex-grow: 1;
+}
+
+.menu ul {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu li {
+    margin-right: 20px;
+}
+
+.menu li:last-child {
+    margin-right: 0;
+}
+
+.menu a {
+    padding: 8px 10px;
+}
+
+
+.menu a:hover {
+    color: #fff;
+    background-color: #ff3d00;
+    border-radius: 8px;
+}
+
+
+
+.menu a,
+.menu .active {
+    display: block;
+    padding: 8px 10px;
+}
+
+.menu .active {
+    color: #fff;
+    background-color: #ff3d00;
+    border-radius: 8px;
+}
+
+.menu ul {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 4px 0 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 18px;
+    list-style: none;
+}
+
+.menu a,
+.menu .active {
+    display: block;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    letter-spacing: .27em;
+}
+
+
+.menu a {
+    color: #000;
+    text-decoration: none;
+}
+
+.register {
+    font-size: 20px;
+    line-height: 24px;
+}
+
+.register a {
+    color: #000;
+    text-decoration: none;
+}
+
+.register a:hover {
+    color: red;
+    text-decoration: none;
+}
+
+/*footer*/
+
+footer {
+    height: 150px;
+    background-color: #000;
+    max-width: none;
+    width: 100%;
+    margin-top: auto;
+}
+
+.footer{
+    background:#000;
+    padding:30px 0px;
+    font-family: 'Play', sans-serif;
+    text-align:center;
+    }
+    
+    .footer .row{
+    width:100%;
+    margin:0% 0%;
+    padding:0.6% 0%;
+    color:gray;
+    font-size:0.8em;
+    }
+    
+    .footer .row a{
+    text-decoration:none;
+    color:gray;
+    transition:0.5s;
+    }
+    
+    .footer .row a:hover{
+    color:#fff;
+    }
+    
+    .footer .row ul{
+    width:100%;
+    }
+    
+    .footer .row ul li{
+    display:inline-block;
+    margin:0px 30px;
+    }
+    
+    .footer .row a i{
+    font-size:2em;
+    margin:0% 1%;
+    }
+    
+    @media (max-width:720px){
+    .footer{
+    text-align:left;
+    padding:5%;
+    }
+    .footer .row ul li{
+    display:block;
+    margin:10px 0px;
+    text-align:left;
+    }
+    .footer .row a i{
+    margin:0% 3%;
+    }
+    }

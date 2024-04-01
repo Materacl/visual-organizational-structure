@@ -1,17 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     {% block title %}<title>Basic</title>{% endblock %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body class="{{template}}">
     <header class="main-header">
         <h1><a class="logo" href="/">Logo</a></h1>
+        <div class="menu">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard/">Dashboard</a></li>
+                <li><a href="/settings/">Настройки</a></li>
+                <li><a href="/help/">Поддержка</a></li>
+            </ul>
+        </div>
+        <div class="register">
+            <a href="/register"><img src="#" alt="0"></a>
+        </div>
+
+
     </header>
 
     <main class="content">
@@ -19,9 +35,30 @@
     </main>
 
     <footer class="main-footer">
-        <p>Footer Info</p>
+        <div class="footer">
+            <div class="row">
+                <a href="https://t.me/brusnikacompany"><i class="fa fa-telegram"></i></a>
+                <a href="https://vk.com/brusnika.company?ysclid=lugpaliq3k847389183"><i class="fa fa-vk"></i></a>
+                <a href="https://www.youtube.com/channel/UCbd7gxDtiUoyHOeWJ97BOhQ"><i class="fa fa-youtube"></i></a>
+                <a href="https://ekaterinburg.brusnika.ru/"><i class="fa fa-internet-explorer"></i></a>
+            </div>
+
+            <div class="row">
+                <ul>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </div>
+
+            <div class="row">
+                Visual organizational structure. 2024
+            </div>
+        </div>
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>
