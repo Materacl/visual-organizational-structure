@@ -17,17 +17,17 @@
         <h1><a class="logo" href="/">Logo</a></h1>
         <div class="menu">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/dashboard/">Dashboard</a></li>
-                <li><a href="/settings/">Настройки</a></li>
-                <li><a href="/help/">Поддержка</a></li>
+                <nav class="main-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/dashboard/">Dashboard</a></li>
+                    <li><a href="/settings/">Настройки</a></li>
+                    <li><a href="/help/">Поддержка</a></li>
+                </nav>
             </ul>
         </div>
         <div class="register">
-            <a href="/register"><img src="#" alt="0"></a>
+            <a href="/register" ><img src="{{ url_for('static', filename='images/login.svg') }}"  alt="register-img" class = "register-photo"/></a>
         </div>
-
-
     </header>
 
     <main class="content">
@@ -45,15 +45,17 @@
 
             <div class="row">
                 <ul>
-                    <li><a href="#">Contact us</a></li>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Help</a></li>
+                    <nav class="footer-nav">
+                        <li><a href="#">Контакты</a></li>
+                        <li><a href="/dashboard/">Dashboard</a></li>
+                        <li><a href="/settings/">Настройки</a></li>
+                        <li><a href="/help/">Поддержка</a></li>
+                    </nav>
                 </ul>
             </div>
 
             <div class="row">
-                Visual organizational structure. 2024
+                Visual organizational structure 2024
             </div>
         </div>
     </footer>

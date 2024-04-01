@@ -1,9 +1,17 @@
 {% extends "layout.jinja2" %}
 {% block title %}<title>Главная страница</title>{% endblock %}
 {% block content %}
-    <h1 class="site-title">{{ title }}</h1>
-    <a href="/dashboard/" class="dash-link">
-    <span>Dasboard</span>
-    <i class="fas fa-arrow-right"></i>
-    </a>
+
+<div class = "main-dash">
+    <article class = "main-dash1">
+        <a href="/dashboard/"><figure><img src="#" alt="" class="dash"></figure></a>
+        <h2>Ваш dashboard</h2>
+    </article>
+
+    <article class = "main-dash2">
+        <figure><img src="#" alt="" class="dash"></figure>
+        <h2>Новый dashboard</h2>
+    </article>
+
+</div>
 {% endblock %}

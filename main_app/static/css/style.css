@@ -4,7 +4,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x:hidden;
+    overflow-x: hidden;
 
 }
 
@@ -21,6 +21,12 @@ header {
 
 .logo {
     margin-right: 30px;
+    color: black;
+    text-decoration: none;
+}
+
+.main-nav {
+    display: flex;
 }
 
 
@@ -51,7 +57,7 @@ header {
 
 .menu a:hover {
     color: #fff;
-    background-color: #ff3d00;
+    background-color: #833df5;
     border-radius: 8px;
 }
 
@@ -65,7 +71,7 @@ header {
 
 .menu .active {
     color: #fff;
-    background-color: #ff3d00;
+    background-color: #8a45dd;
     border-radius: 8px;
 }
 
@@ -104,8 +110,18 @@ header {
 }
 
 .register a:hover {
-    color: red;
     text-decoration: none;
+}
+
+.register-photo {
+    width: 30px;
+    height: 30px;
+    margin: 20px;
+    transition: 1s;
+}
+
+.register-photo:hover {
+    transform: scale(1.2);
 }
 
 /*footer*/
@@ -118,56 +134,124 @@ footer {
     margin-top: auto;
 }
 
-.footer{
-    background:#000;
-    padding:30px 0px;
+.footer {
+    background: #000;
+    padding: 30px 0px;
     font-family: 'Play', sans-serif;
-    text-align:center;
+    text-align: center;
+}
+
+.footer .row {
+    width: 100%;
+    margin: 0% 0%;
+    padding: 0.6% 0%;
+    color: gray;
+    font-size: 0.8em;
+}
+
+.footer .row a {
+    text-decoration: none;
+    color: gray;
+    transition: 0.5s;
+}
+
+.footer .row a:hover {
+    color: #fff;
+}
+
+.footer .row ul {
+    width: 100%;
+}
+
+.footer .row ul li {
+    display: inline-block;
+    margin: 0px 30px;
+}
+
+.footer .row a i {
+    font-size: 2em;
+    margin: 0% 1%;
+}
+
+@media (max-width:720px) {
+    .footer {
+        text-align: left;
+        padding: 5%;
     }
-    
-    .footer .row{
-    width:100%;
-    margin:0% 0%;
-    padding:0.6% 0%;
-    color:gray;
-    font-size:0.8em;
+
+    .footer .row ul li {
+        display: block;
+        margin: 10px 0px;
+        text-align: left;
     }
-    
-    .footer .row a{
-    text-decoration:none;
-    color:gray;
-    transition:0.5s;
+
+    .footer .row a i {
+        margin: 0% 3%;
     }
-    
-    .footer .row a:hover{
-    color:#fff;
-    }
-    
-    .footer .row ul{
-    width:100%;
-    }
-    
-    .footer .row ul li{
-    display:inline-block;
-    margin:0px 30px;
-    }
-    
-    .footer .row a i{
-    font-size:2em;
-    margin:0% 1%;
-    }
-    
-    @media (max-width:720px){
-    .footer{
-    text-align:left;
-    padding:5%;
-    }
-    .footer .row ul li{
-    display:block;
-    margin:10px 0px;
-    text-align:left;
-    }
-    .footer .row a i{
-    margin:0% 3%;
-    }
-    }
+}
+
+
+/*main page dashboards*/
+
+
+h2 {
+    font-weight: 400;
+    margin: 2rem 0 0.25rem 0;
+}
+
+figure {
+    width: 500px;
+    aspect-ratio: 8 / 5;
+    --bg: hsl(330 80% calc(90% - (var(--hover) * 10%)));
+    --accent: hsl(245, 56%, 41%);
+    transition: background 0.2s;
+    background:
+        radial-gradient(circle at top left, var(--accent), transparent 75%),
+        var(--bg);
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+}
+
+figure:after {
+    content: "";
+    position: absolute;
+    width: 20%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    bottom: 0%;
+    left: 10%;
+    background: linear-gradient(-65deg, var(--bg) 50%, var(--accent) 50%);
+    filter: blur(25px);
+    transform:
+        translateX(calc(var(--hover) * 15%)) scale(calc(1 + (var(--hover) * 0.2)));
+    transition: transform 0.2s, background 0.2s;
+}
+
+.dash {
+    position: absolute;
+    left: 20%;
+    top: 15%;
+    width: 40%;
+    transform:
+        translateX(calc(var(--hover) * -15%)) scale(calc(1 + (var(--hover) * 0.2)));
+    transition: transform 0.2s;
+}
+
+article {
+    --hover: 0;
+}
+
+article:hover {
+    --hover: 1;
+}
+
+.main-dash {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.main-dash1{margin-right: 50px;}
+.main-dash2{margin-right: 50px;}
