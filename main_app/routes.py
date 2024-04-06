@@ -1,4 +1,4 @@
-"""Routes for parent Flask app."""
+# Routes for parent Flask app
 from flask import current_app as app
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user
@@ -21,7 +21,7 @@ def home():
     )
 
 
-@app.route('/login', methods=['GET, POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     login = request.form.get('login')
     password = request.form.get('password')
@@ -32,7 +32,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             next_page = request.args.get('next')
-            return redirect(next_page)
+            return redirect(next_page or url_for('home'))
         else:
             flash('Логин или пароль некорректны')
     else:
@@ -41,14 +41,14 @@ def login():
     return render_template('login.jinja2')
 
 
-@app.route('/register', methods=['GET, POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     login = request.form.get('login')
     password = request.form.get('password')
     password2 = request.form.get('password2')
 
     if request.method == 'POST':
-        if not (login or password or password2):
+        if not (login and password and password2):
             flash('Заполните все поля')
         elif password != password2:
             flash('Пароли не совпадают')
@@ -58,20 +58,20 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            return redirect(url_for('login_page'))
+            return redirect(url_for('login'))
 
     return render_template('register.jinja2')
 
 
-@app.route('/logout', methods=['GET, POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('/'))
+    return redirect(url_for('home'))
 
 
 @app.after_request
 def redirect_to_signin(response):
     if response.status == 401:
-        return redirect(url_for('login_page')+'?next='+request.url)
+        return redirect(url_for('login') + '?next=' + request.url)
     return response
