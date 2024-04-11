@@ -1,7 +1,9 @@
 import dash
-from dash import html, Input, Output, callback, dcc
+from dash import html, Input, Output, callback, State
 import dash_cytoscape as cyto
+import dash_bootstrap_components as dbc
 
+# Register the Dash app page
 dash.register_page(
     __name__,
     path='/',
@@ -42,22 +44,23 @@ edges = [
     )
 ]
 
-elements = nodes + edges
 graph_elements = nodes + edges
 
-layout = html.Div([
-    # Grid-like cell background
-    html.Div(
-        style={
-            'position': 'fixed',
-            'width': '100%',
-            'height': '100%',
-            'background-image': 'linear-gradient(90deg, #ccc 1px, transparent 1px), linear-gradient(180deg, #ccc 1px, transparent 1px)',
-            'background-size': '20px 20px',
-            'background-position': '0 0, 0 0',
-            'background-attachment': 'fixed'
-        }
+# Define the collapse component for node information
+node_info_collapse = dbc.Collapse(
+    dbc.Card(
+        [
+            dbc.CardHeader("Node Information"),
+            dbc.CardBody(html.Div(id='node-info-content'))
+        ]
     ),
+    id='node-info-collapse',
+    is_open=False,
+    style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
+)
+
+# Define the Dash app layout
+layout = html.Div([
     cyto.Cytoscape(
         id='cytoscape-org-graph',
         layout={
@@ -84,13 +87,64 @@ layout = html.Div([
         boxSelectionEnabled=True,
         responsive=True,
         style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
-        elements=graph_elements
+        elements=graph_elements,
+        stylesheet=[
+            {
+                'selector': 'node',
+                'style': {
+                    'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
+                    'shape': 'ellipse',  # Use ellipse shape for nodes
+                    'width': 50,  # Set node width
+                    'height': 50  # Set node height
+                }
+            },
+            {
+                'selector': 'edge',
+                'style': {
+                    'width': 3,
+                    'line-color': '#ccc',
+                    'target-arrow-color': '#ccc',
+                    'target-arrow-shape': 'triangle'
+                }
+            }
+        ]
     ),
     html.Div([
-        html.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
-        html.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
-    ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'})
+        dbc.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
+        dbc.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
+    ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'}),
+    node_info_collapse
 ])
+
+
+# Define Dash callbacks
+@callback(Output('node-info-content', 'children'),
+          Input('cytoscape-org-graph', 'tapNodeData'))
+def update_node_info(data):
+    if data:
+        return html.P(f"You clicked on {data['label']}. Additional info can be shown here.")
+    return None
+
+
+@callback(
+    Output('node-info-collapse', 'is_open'),
+    Input('cytoscape-org-graph', 'tapNodeData'),
+    Input('node-info-collapse', 'is_open'),
+    State('node-info-collapse', 'children')
+)
+def toggle_collapse(data, is_open, current_node_data):
+    if data:
+        if data == current_node_data:
+            return not is_open
+        return True
+    return False
+
+
+@callback(Output('cytoscape-mouseoverNodeData-output', 'children'),
+          Input('cytoscape-org-graph', 'mouseoverNodeData'))
+def displayMouseoverNodeData(data):
+    if data:
+        return "You recently hovered over the city: " + data['label']
 
 
 @callback(Output('cytoscape-tapNodeData-output', 'children'),
@@ -98,13 +152,6 @@ layout = html.Div([
 def displayTapNodeData(data):
     if data:
         return "You recently clicked/tapped the city: " + data['label']
-
-
-@callback(Output('cytoscape-mouseoverNodeData-output', 'children'),
-          Input('cytoscape-org-graph', 'mouseoverNodeData'))
-def displayTapNodeData(data):
-    if data:
-        return "You recently hovered over the city: " + data['label']
 
 
 @callback(Output('cytoscape-selectedNodeData-markdown', 'children'),

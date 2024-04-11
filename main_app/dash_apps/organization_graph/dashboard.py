@@ -22,11 +22,12 @@ def init_dashboard(server):
     )
 
     # Create Dash Layout
-    dash_app.layout = dcc.Loading(
+    dash_app.layout = dbc.Spinner(
         [
             html.A('Home', href='/', style={'position': 'absolute', 'top': '10px', 'left': '10px', 'transform': 'translateY(-50%)'}),
             dash.page_container
         ],
+        spinner_style={"width": "3rem", "height": "3rem"},
         id='dash-container',
         color='primary',
         fullscreen=True
