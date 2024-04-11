@@ -24,8 +24,18 @@ def init_dashboard(server):
     # Create Dash Layout
     dash_app.layout = dbc.Spinner(
         [
-            html.A('Home', href='/', style={'position': 'absolute', 'top': '10px', 'left': '10px', 'transform': 'translateY(-50%)'}),
-            dash.page_container
+            dash.page_container,
+            html.A(
+                [
+                    html.I(className='bi bi-house-door', style={'fontSize': '24px', 'color': 'black'}),
+                ],
+                href='/', style={
+                    'position': 'absolute',
+                    'top': '25px',
+                    'left': '15px',
+                    'transform': 'translateY(-50%)'
+                }
+            ),
         ],
         spinner_style={"width": "3rem", "height": "3rem"},
         id='dash-container',
