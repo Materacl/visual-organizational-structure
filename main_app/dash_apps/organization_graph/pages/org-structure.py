@@ -3,6 +3,9 @@ from dash import html, Input, Output, callback, State
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 
+from flask_login import current_user
+from main_app.models import Dashboard
+
 # Register the Dash app page
 dash.register_page(
     __name__,
@@ -62,6 +65,20 @@ node_info_collapse = dbc.Collapse(
 
 # Define the Dash app layout
 def layout(dashboard_id=None):
+    dashboard = Dashboard.query.get(dashboard_id)
+
+    if not dashboard or dashboard.user_id != current_user.id:
+        return html.Div(
+            "This is not your board.",
+            style={
+                'display': 'flex',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'height': '100vh',
+                'font-size': '2em'
+            }
+        )
+
     return html.Div([
         cyto.Cytoscape(
             id='cytoscape-org-graph',
