@@ -25,8 +25,20 @@
                 </nav>
             </ul>
         </div>
-        <div class="register">
-            <a href="/register" ><img src="{{ url_for('static', filename='images/login.svg') }}"  alt="register-img" class = "register-photo"/></a>
+        <div class="user-info">
+            {% if current_user.is_authenticated %}
+                <p>Welcome, {{ current_user.login }}</p>
+                <div class="user-actions">
+                    <a href="/logout" class="logout-button">Logout</a>
+                    <div class="register">
+                        <a href="/"><img src="{{ url_for('static', filename='images/login.svg') }}" alt="register-img" class="register-photo"/></a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="register">
+                    <a href="/register"><img src="{{ url_for('static', filename='images/login.svg') }}" alt="register-img" class="register-photo"/></a>
+                </div>
+            {% endif %}
         </div>
     </header>
 

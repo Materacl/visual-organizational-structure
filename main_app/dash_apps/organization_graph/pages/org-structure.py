@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 # Register the Dash app page
 dash.register_page(
     __name__,
-    path='/',
+    path_template="/org-structure/<dashboard_id>",
     title='org-structure page',
     name='org-structure page'
 )
@@ -59,62 +59,64 @@ node_info_collapse = dbc.Collapse(
     style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
 )
 
+
 # Define the Dash app layout
-layout = html.Div([
-    cyto.Cytoscape(
-        id='cytoscape-org-graph',
-        layout={
-            'name': 'breadthfirst',
-            'roots': '[id = "nyc"]',
-            'idealEdgeLength': 100,
-            'nodeOverlap': 20,
-            'refresh': 20,
-            'fit': True,
-            'padding': 30,
-            'randomize': False,
-            'componentSpacing': 100,
-            'nodeRepulsion': 400000,
-            'edgeElasticity': 100,
-            'nestingFactor': 5,
-            'gravity': 80,
-            'numIter': 1000,
-            'initialTemp': 200,
-            'coolingFactor': 0.95,
-            'minTemp': 1.0
-        },
-        minZoom=0.5,
-        maxZoom=5,
-        boxSelectionEnabled=True,
-        responsive=True,
-        style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
-        elements=graph_elements,
-        stylesheet=[
-            {
-                'selector': 'node',
-                'style': {
-                    'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
-                    'shape': 'ellipse',  # Use ellipse shape for nodes
-                    'width': 50,  # Set node width
-                    'height': 50  # Set node height
-                }
+def layout(dashboard_id=None):
+    return html.Div([
+        cyto.Cytoscape(
+            id='cytoscape-org-graph',
+            layout={
+                'name': 'breadthfirst',
+                'roots': '[id = "nyc"]',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                'fit': True,
+                'padding': 30,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0
             },
-            {
-                'selector': 'edge',
-                'style': {
-                    'width': 3,
-                    'line-color': '#ccc',
-                    'target-arrow-color': '#ccc',
-                    'target-arrow-shape': 'triangle'
+            minZoom=0.5,
+            maxZoom=5,
+            boxSelectionEnabled=True,
+            responsive=True,
+            style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
+            elements=graph_elements,
+            stylesheet=[
+                {
+                    'selector': 'node',
+                    'style': {
+                        'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
+                        'shape': 'ellipse',  # Use ellipse shape for nodes
+                        'width': 50,  # Set node width
+                        'height': 50  # Set node height
+                    }
+                },
+                {
+                    'selector': 'edge',
+                    'style': {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle'
+                    }
                 }
-            }
-        ]
-    ),
-    html.Div([
-        dbc.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
-        dbc.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
-    ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'}),
-    node_info_collapse
-])
+            ]
+        ),
+        html.Div([
+            dbc.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
+            dbc.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
+        ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'}),
+        node_info_collapse
+    ])
 
 
 # Define Dash callbacks

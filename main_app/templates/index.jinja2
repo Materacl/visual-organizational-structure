@@ -3,15 +3,23 @@
 {% block content %}
 
 <div class = "main-dash">
-    <article class = "main-dash1">
-        <a href="/dashboard/"><figure><img src="#" alt="" class="dash"></figure></a>
-        <h2>Ваш dashboard</h2>
+    {% for dashboard in current_user.dashboards %}
+    <article>
+        <a href="/dashboard/{{ dashboard.id }}"><h2>{{ dashboard.name }}</h2></a>
     </article>
+    {% endfor %}
 
-    <article class = "main-dash2">
-        <figure><img src="#" alt="" class="dash"></figure>
-        <h2>Новый dashboard</h2>
-    </article>
+    <form action="/create_dashboard" method="post">
+        <input type="text" name="name" placeholder="Dashboard name">
+        <input type="submit" value="Create Dashboard">
+    </form>
+
+    <!-- Add delete dashboard form for each dashboard -->
+    {% for dashboard in current_user.dashboards %}
+        <form action="/delete_dashboard/{{ dashboard.id }}" method="post">
+            <button type="submit">Delete {{ dashboard.name }}</button>
+        </form>
+    {% endfor %}
 
 </div>
 {% endblock %}
