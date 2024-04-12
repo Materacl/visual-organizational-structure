@@ -8,6 +8,10 @@ body {
 
 }
 
+a {
+        text-decoration: none; /* Remove underlining from all links */
+}
+
 
 /*header*/
 header {
@@ -192,8 +196,6 @@ footer {
 
 
 /*main page dashboards*/
-
-
 h2 {
     font-weight: 400;
     margin: 2rem 0 0.25rem 0;
@@ -250,8 +252,36 @@ article:hover {
 .main-dash {
     display: flex;
     justify-content: center;
-    margin-top: 100px;
+    margin: 100px;
 }
 
-.main-dash1{margin-right: 50px;}
-.main-dash2{margin-right: 50px;}
+.dash-cards {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: left; /* Center items horizontally */
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.dash-card {
+    display: flex;
+}
+
+.dash-text {
+    color: white;
+    font-size: 60px;
+    margin: auto;
+}
+
+.dash-create-text {
+    color: white;
+    font-size: 24px;
+    text-decoration: none;
+}
+
+.create-dashboard-form {
+    z-index: 1000; /* Ensure form is above other content */
+    background-color: white; /* Set background color */
+    padding: 20px; /* Add padding */
+    border-radius: 8px; /* Add rounded corners */
+}

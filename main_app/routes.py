@@ -1,11 +1,13 @@
 # Routes for parent Flask app
-from flask import current_app as app
+from flask import current_app as app, current_app
 from flask import render_template, request, flash, redirect, url_for
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from main_app import db
-from main_app.models import User
+from main_app.models import User, Dashboard
+
+from .dash_apps.organization_graph.dashboard import init_dashboard
 
 
 @app.route("/")
@@ -75,3 +77,51 @@ def redirect_to_signin(response):
     if response.status == 401:
         return redirect(url_for('login') + '?next=' + request.url)
     return response
+
+
+@app.route('/create_dashboard', methods=['POST'])
+@login_required
+def create_dashboard():
+    name = request.form.get('name')
+
+    if name:
+        new_dashboard = Dashboard(name=name, user_id=current_user.id)
+        db.session.add(new_dashboard)
+        db.session.commit()
+        flash('Dashboard created successfully!')
+
+        # Redirect to the new dashboard's URL
+        return redirect(url_for('view_dashboard', dashboard_id=new_dashboard.id))
+    else:
+        flash('Name is required for the dashboard')
+
+    return redirect(url_for('home'))
+
+
+@app.route('/dashboard/<int:dashboard_id>')
+@login_required
+def view_dashboard(dashboard_id):
+    dashboard = Dashboard.query.get(dashboard_id)
+
+    if dashboard.user_id != current_user.id:
+        flash('Unauthorized access')
+        return redirect(url_for('home'))
+
+    # Redirect to the correct URL
+    return redirect(f'org-structure/{dashboard_id}')
+
+
+@app.route('/delete_dashboard/<int:dashboard_id>', methods=['POST'])
+@login_required
+def delete_dashboard(dashboard_id):
+    dashboard = Dashboard.query.get(dashboard_id)
+
+    if dashboard.user_id != current_user.id:
+        flash('Unauthorized access')
+        return redirect(url_for('home'))
+
+    db.session.delete(dashboard)
+    db.session.commit()
+    flash('Dashboard deleted successfully!')
+
+    return redirect(url_for('home'))

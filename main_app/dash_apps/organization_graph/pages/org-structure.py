@@ -3,10 +3,13 @@ from dash import html, Input, Output, callback, State
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 
+from flask_login import current_user
+from main_app.models import Dashboard
+
 # Register the Dash app page
 dash.register_page(
     __name__,
-    path='/',
+    path_template="/org-structure/<dashboard_id>",
     title='org-structure page',
     name='org-structure page'
 )
@@ -59,62 +62,83 @@ node_info_collapse = dbc.Collapse(
     style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
 )
 
+
 # Define the Dash app layout
-layout = html.Div([
-    cyto.Cytoscape(
-        id='cytoscape-org-graph',
-        layout={
-            'name': 'breadthfirst',
-            'roots': '[id = "nyc"]',
-            'idealEdgeLength': 100,
-            'nodeOverlap': 20,
-            'refresh': 20,
-            'fit': True,
-            'padding': 30,
-            'randomize': False,
-            'componentSpacing': 100,
-            'nodeRepulsion': 400000,
-            'edgeElasticity': 100,
-            'nestingFactor': 5,
-            'gravity': 80,
-            'numIter': 1000,
-            'initialTemp': 200,
-            'coolingFactor': 0.95,
-            'minTemp': 1.0
-        },
-        minZoom=0.5,
-        maxZoom=5,
-        boxSelectionEnabled=True,
-        responsive=True,
-        style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
-        elements=graph_elements,
-        stylesheet=[
-            {
-                'selector': 'node',
-                'style': {
-                    'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
-                    'shape': 'ellipse',  # Use ellipse shape for nodes
-                    'width': 50,  # Set node width
-                    'height': 50  # Set node height
-                }
-            },
-            {
-                'selector': 'edge',
-                'style': {
-                    'width': 3,
-                    'line-color': '#ccc',
-                    'target-arrow-color': '#ccc',
-                    'target-arrow-shape': 'triangle'
-                }
+def layout(dashboard_id=None):
+    dashboard = Dashboard.query.get(dashboard_id)
+
+    if not dashboard or dashboard.user_id != current_user.id:
+        return html.Div(
+            "This is not your board.",
+            style={
+                'display': 'flex',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'height': '100vh',
+                'font-size': '2em'
             }
-        ]
-    ),
-    html.Div([
-        dbc.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
-        dbc.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
-    ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'}),
-    node_info_collapse
-])
+        )
+
+    return html.Div([
+        cyto.Cytoscape(
+            id='cytoscape-org-graph',
+            layout={
+                'name': 'breadthfirst',
+                'roots': '[id = "nyc"]',
+                'idealEdgeLength': 100,
+                'nodeOverlap': 20,
+                'refresh': 20,
+                'fit': True,
+                'padding': 30,
+                'randomize': False,
+                'componentSpacing': 100,
+                'nodeRepulsion': 400000,
+                'edgeElasticity': 100,
+                'nestingFactor': 5,
+                'gravity': 80,
+                'numIter': 1000,
+                'initialTemp': 200,
+                'coolingFactor': 0.95,
+                'minTemp': 1.0
+            },
+            minZoom=0.5,
+            maxZoom=5,
+            boxSelectionEnabled=True,
+            responsive=True,
+            style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
+            elements=graph_elements,
+            stylesheet=[
+                {
+                    'selector': 'node',
+                    'style': {
+                        'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
+                        'shape': 'ellipse',  # Use ellipse shape for nodes
+                        'width': 50,  # Set node width
+                        'height': 50  # Set node height
+                    }
+                },
+                {
+                    'selector': 'edge',
+                    'style': {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle'
+                    }
+                }
+            ]
+        ),
+        dbc.ButtonGroup([
+            dbc.Button('Button 1', id='button-1', n_clicks=0),
+            dbc.Button('Button 2', id='button-2', n_clicks=0)
+        ],
+            style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'},
+            size="md",
+            vertical=True,
+        ),
+
+        node_info_collapse
+    ])
 
 
 # Define Dash callbacks
