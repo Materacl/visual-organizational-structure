@@ -128,10 +128,15 @@ def layout(dashboard_id=None):
                 }
             ]
         ),
-        html.Div([
-            dbc.Button('Button 1', id='button-1', n_clicks=0, style={'display': 'block', 'margin-bottom': '10px'}),
-            dbc.Button('Button 2', id='button-2', n_clicks=0, style={'display': 'block'})
-        ], style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'}),
+        dbc.ButtonGroup([
+            dbc.Button('Button 1', id='button-1', n_clicks=0),
+            dbc.Button('Button 2', id='button-2', n_clicks=0)
+        ],
+            style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'},
+            size="md",
+            vertical=True,
+        ),
+
         node_info_collapse
     ])
 
