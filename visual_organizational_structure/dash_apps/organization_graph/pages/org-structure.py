@@ -6,6 +6,8 @@ import dash_bootstrap_components as dbc
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
 
+from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph
+
 # Register the Dash app page
 dash.register_page(
     __name__,
@@ -80,54 +82,7 @@ def layout(dashboard_id=None):
         )
 
     return html.Div([
-        cyto.Cytoscape(
-            id='cytoscape-org-graph',
-            layout={
-                'name': 'breadthfirst',
-                'roots': '[id = "nyc"]',
-                'idealEdgeLength': 100,
-                'nodeOverlap': 20,
-                'refresh': 20,
-                'fit': True,
-                'padding': 30,
-                'randomize': False,
-                'componentSpacing': 100,
-                'nodeRepulsion': 400000,
-                'edgeElasticity': 100,
-                'nestingFactor': 5,
-                'gravity': 80,
-                'numIter': 1000,
-                'initialTemp': 200,
-                'coolingFactor': 0.95,
-                'minTemp': 1.0
-            },
-            minZoom=0.5,
-            maxZoom=5,
-            boxSelectionEnabled=True,
-            responsive=True,
-            style={'width': '100%', 'height': '100vh', 'position': 'fixed', 'top': 0, 'left': 0},
-            elements=graph_elements,
-            stylesheet=[
-                {
-                    'selector': 'node',
-                    'style': {
-                        'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
-                        'shape': 'ellipse',  # Use ellipse shape for nodes
-                        'width': 50,  # Set node width
-                        'height': 50  # Set node height
-                    }
-                },
-                {
-                    'selector': 'edge',
-                    'style': {
-                        'width': 3,
-                        'line-color': '#ccc',
-                        'target-arrow-color': '#ccc',
-                        'target-arrow-shape': 'triangle'
-                    }
-                }
-            ]
-        ),
+        get_tree_graph(graph_elements),
         dbc.ButtonGroup([
             dbc.Button('Button 1', id='button-1', n_clicks=0),
             dbc.Button('Button 2', id='button-2', n_clicks=0)
