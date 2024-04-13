@@ -17,7 +17,7 @@ def get_tree_graph(graph_elements=None):
         # Layout configuration
         layout={
             'name': 'breadthfirst',  # Use 'breadthfirst' layout algorithm
-            'roots': '[id = "nyc"]',  # Root node
+            'roots': '[id = "LE1"]',  # Root node
             'idealEdgeLength': 100,
             'nodeOverlap': 20,
             'refresh': 20,
@@ -56,10 +56,19 @@ def get_tree_graph(graph_elements=None):
             {
                 'selector': 'node',  # Style for nodes
                 'style': {
-                    'background-color': 'rgba(0, 128, 0, 0.5)',  # Green with opacity
-                    'shape': 'ellipse',  # Use ellipse shape for nodes
-                    'width': 50,  # Set node width
-                    'height': 50  # Set node height
+                    'label': 'data(label)',  # Updated to use 'label' from node data
+                    'text-valign': 'center',  # Center the text vertically
+                    'text-halign': 'center',  # Align the text to the center
+                    'text-margin-y': '0px',  # Adjust vertical text margin
+                    'text-margin-x': '0px',  # Adjust horizontal text margin
+                    'background-color': '#1f77b4',  # Change node color to a blue shade
+                    'color': 'white',  # Change text color to white
+                    'shape': 'roundrectangle',  # Use roundrectangle shape for nodes
+                    'width': 'label',  # Set node width based on label size
+                    'height': 'label',  # Set node height based on label size
+                    'font-size': '16px',  # Adjust font size
+                    'padding': '10px',  # Add padding to node
+                    'text-wrap': 'wrap'  # Allow text to wrap within node
                 }
             },
             {

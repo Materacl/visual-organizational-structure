@@ -1,12 +1,16 @@
+import base64
+
 import dash
-from dash import html, Input, Output, callback, State
-import dash_cytoscape as cyto
+from dash import html, dcc, Input, Output, callback, State
 import dash_bootstrap_components as dbc
+from dash.exceptions import PreventUpdate
 
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
 
 from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph
+from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
+
 
 # Register the Dash app page
 dash.register_page(
@@ -82,7 +86,25 @@ def layout(dashboard_id=None):
         )
 
     return html.Div([
-        get_tree_graph(graph_elements),
+        get_tree_graph(csv_handling.test_graph_data),
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            },
+            multiple=False
+        ),
         dbc.ButtonGroup([
             dbc.Button('Button 1', id='button-1', n_clicks=0),
             dbc.Button('Button 2', id='button-2', n_clicks=0)
@@ -141,3 +163,24 @@ def displaySelectedNodeData(data_list):
 
     cities_list = [data['label'] for data in data_list]
     return "You selected the following cities: " + "\n* ".join(cities_list)
+
+
+# Add callback to handle file upload
+@callback(
+    Output('cytoscape-org-graph', 'elements'),
+    Input('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    prevent_initial_call=True
+)
+def update_graph(contents, filename):
+    if contents is None:
+        raise PreventUpdate
+
+    content_type, content_string = contents.split(',')
+
+    decoded = base64.b64decode(content_string)
+
+    # Call method from csv_handling.py to generate nodes
+    nodes = csv_handling.generate_graph_data_from_csv(decoded.decode('utf-8'))
+
+    return nodes
