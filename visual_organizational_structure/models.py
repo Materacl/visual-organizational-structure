@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 
-from main_app import db, manager
+from visual_organizational_structure import db, manager
 
 
 class User(db.Model, UserMixin):

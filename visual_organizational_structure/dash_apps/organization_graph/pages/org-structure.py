@@ -4,7 +4,7 @@ import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 
 from flask_login import current_user
-from main_app.models import Dashboard
+from visual_organizational_structure.models import Dashboard
 
 # Register the Dash app page
 dash.register_page(
