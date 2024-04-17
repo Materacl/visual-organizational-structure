@@ -22,6 +22,12 @@ def home():
         base_url=request.base_url,
     )
 
+@app.route("/profile")
+def profile():
+    return render_template(
+        "profile.jinja2",
+    )
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
