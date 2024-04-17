@@ -9,7 +9,8 @@ body {
 }
 
 a {
-        text-decoration: none; /* Remove underlining from all links */
+    text-decoration: none;
+    /* Remove underlining from all links */
 }
 
 
@@ -80,8 +81,10 @@ header {
 }
 
 .menu ul {
-    display: flex;
-    flex-flow: row nowrap;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    justify-content: space-around;
     margin: 4px 0 0;
     padding: 0;
     font-size: 16px;
@@ -106,6 +109,14 @@ header {
 .register {
     font-size: 20px;
     line-height: 24px;
+    background-color: white;
+}
+.register:active {
+    background-color: white;
+}
+
+.register:hover {
+    background-color: white;
 }
 
 .register a {
@@ -113,8 +124,13 @@ header {
     text-decoration: none;
 }
 
+.register a:active{
+    background-color: white;
+}
+
 .register a:hover {
     text-decoration: none;
+    background-color: white;
 }
 
 .register-photo {
@@ -126,7 +142,56 @@ header {
 
 .register-photo:hover {
     transform: scale(1.2);
+    
 }
+
+
+
+
+/*
+.user-info {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    margin: 4px 0 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 18px;
+    list-style: none;
+    
+}
+*/
+
+.user-info{
+    margin-left: auto;
+}
+
+.user-info-text{
+
+}
+
+.user-info ul{
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+
+.user-info li{
+    display: inline;
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 18px;
+    padding: 18px;
+    margin-right: 0;
+}
+
+
+
 
 /*footer*/
 
@@ -257,8 +322,10 @@ article:hover {
 
 .dash-cards {
     display: flex;
-    align-items: center; /* Center items vertically */
-    justify-content: left; /* Center items horizontally */
+    align-items: center;
+    /* Center items vertically */
+    justify-content: left;
+    /* Center items horizontally */
     gap: 25px;
     flex-wrap: wrap;
 }
@@ -280,8 +347,12 @@ article:hover {
 }
 
 .create-dashboard-form {
-    z-index: 1000; /* Ensure form is above other content */
-    background-color: white; /* Set background color */
-    padding: 20px; /* Add padding */
-    border-radius: 8px; /* Add rounded corners */
+    z-index: 1000;
+    /* Ensure form is above other content */
+    background-color: white;
+    /* Set background color */
+    padding: 20px;
+    /* Add padding */
+    border-radius: 8px;
+    /* Add rounded corners */
 }

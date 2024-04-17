@@ -27,17 +27,25 @@
         </div>
         <div class="user-info">
             {% if current_user.is_authenticated %}
-                <p>Welcome, {{ current_user.login }}</p>
-                <div class="user-actions">
-                    <a href="/logout" class="logout-button">Logout</a>
+            <ul class = "menu">
+                <li ><div class="user-actions">
+                    <a href="/logout" class="logout-button">Выйти</a></li>
                     <div class="register">
-                        <a href="/"><img src="{{ url_for('static', filename='images/login.svg') }}" alt="register-img" class="register-photo"/></a>
+                        <a href="/profile"><img src="{{ url_for('static', filename='images/login.svg') }}"
+                                alt="register-img" class="register-photo" /></a>               
                     </div>
                 </div>
+            </ul>
             {% else %}
-                <div class="register">
-                    <a href="/register"><img src="{{ url_for('static', filename='images/login.svg') }}" alt="register-img" class="register-photo"/></a>
+            <ul class = "menu">
+                <li ><div class="user-actions">
+                    <a href="/register" class="logout-button">Войти</a></li>
+                    <div class="register">
+                        <a href="/register"><img src="{{ url_for('static', filename='images/login.svg') }}"
+                                alt="register-img" class="register-photo" /></a>               
+                    </div>
                 </div>
+            </ul>
             {% endif %}
         </div>
     </header>
