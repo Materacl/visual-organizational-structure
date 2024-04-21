@@ -4,8 +4,8 @@ from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from main_app import db
-from main_app.models import User, Dashboard
+from visual_organizational_structure import db
+from visual_organizational_structure.models import User, Dashboard
 
 from .dash_apps.organization_graph.dashboard import init_dashboard
 
