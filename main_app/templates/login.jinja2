@@ -1,36 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset='UTF=8'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-<h1>Login page</h1>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
+<body class="login-body">
+
+
+    {% for category, message in get_flashed_messages(with_categories=True) %}
+    <label>
+        <input type="checkbox" class="alertCheckbox" autocomplete="off" />
+        <div class="alert error">
+            <span class="alertClose">X</span>
+            <span class="alertText">{{message}}
+                <br class="clear" /></span>
+        </div>
+    </label>
     {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
 
     <form method="POST">
-        <table>
-            <tr>
-                <td>Login</td>
-                <td><input type='text' name='login'></td>
-            </tr>
-            <tr>
-                <td>Password</td>
-                <td><input type='password' name='password'></td>
-            </tr>
-            <tr>
-                <td><a href="{{ url_for('register') }}">Register</a></td>
-                <td><input type="submit" value="Login"></td>
-            </tr>
-        </table>
+        <div class="container">
+            <div class="left">
+                <div class="header">
+                    <h2 class="animation a1">Добро пожаловать</h2>
+                    <h4 class="animation a2">Войдите в аккаунт, используя логин и пароль</h4>
+                </div>
+                <div class="form">
+                    <input type="login" name='login' class="form-field animation a3" placeholder="login">
+                    <input type="password" name='password' class="form-field animation a4" placeholder="password">
+                    <p class="animation a5"><a href="#">Забыл пароль</a></p>
+                    <button class="animation a6" type="submit" value="login">Войти</button>
+                </div>
+            </div>
+            <div class="right"></div>
+        </div>
     </form>
-</body>
+
+
 </html>
