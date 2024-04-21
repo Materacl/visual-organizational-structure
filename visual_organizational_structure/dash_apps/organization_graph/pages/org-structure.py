@@ -1,7 +1,11 @@
 import base64
+import datetime
+import io
+
+import pandas as pd
 
 import dash
-from dash import html, dcc, Input, Output, callback, State
+from dash import html, dcc, Input, Output, callback, State, dash_table
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 
@@ -11,6 +15,15 @@ from visual_organizational_structure.models import Dashboard
 from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 
+from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
+
+import dash
+
+import base64
+import datetime
+import io
+
+import pandas as pd
 
 # Register the Dash app page
 dash.register_page(
@@ -19,41 +32,6 @@ dash.register_page(
     title='org-structure page',
     name='org-structure page'
 )
-
-# Nodes and edges definitions
-nodes = [
-    {
-        'data': {'id': short, 'label': label}
-    }
-    for short, label in (
-        ('la', 'Los Angeles'),
-        ('nyc', 'New York'),
-        ('to', 'Toronto'),
-        ('mtl', 'Montreal'),
-        ('van', 'Vancouver'),
-        ('chi', 'Chicago'),
-        ('bos', 'Boston'),
-        ('hou', 'Houston')
-    )
-]
-
-edges = [
-    {'data': {'source': source, 'target': target}}
-    for source, target in (
-        ('van', 'la'),
-        ('la', 'chi'),
-        ('hou', 'chi'),
-        ('to', 'mtl'),
-        ('mtl', 'bos'),
-        ('nyc', 'bos'),
-        ('to', 'hou'),
-        ('to', 'nyc'),
-        ('la', 'nyc'),
-        ('nyc', 'bos')
-    )
-]
-
-graph_elements = nodes + edges
 
 # Define the collapse component for node information
 node_info_collapse = dbc.Collapse(
@@ -86,7 +64,7 @@ def layout(dashboard_id=None):
         )
 
     return html.Div([
-        get_tree_graph(csv_handling.test_graph_data),
+        get_tree_graph([]),
         dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -103,7 +81,8 @@ def layout(dashboard_id=None):
                 'textAlign': 'center',
                 'margin': '10px'
             },
-            multiple=False
+            # Allow multiple files to be uploaded
+            multiple=True
         ),
         dbc.ButtonGroup([
             dbc.Button('Button 1', id='button-1', n_clicks=0),
@@ -116,6 +95,87 @@ def layout(dashboard_id=None):
 
         node_info_collapse
     ])
+
+
+def generate_graph_data_from_csv(csv_content):
+    # Read the CSV string into a DataFrame
+    df = pd.read_csv(io.StringIO(csv_content))
+
+    # Initialize lists to store nodes and edges
+    graph_nodes = []
+    graph_edges = []
+
+    # Iterate over the rows in the DataFrame to generate nodes
+    for index, row in df.iterrows():
+        # Generate node data
+        node_data = {
+            'data': {
+                'id': row['Номер позиции'],
+                'label': row['ФИО'] if row['ФИО'] != 'Вакансия' else row['Должность'],
+                'job_title': row['Должность'],
+                'job_type': row['Тип работы']
+            }
+        }
+
+        # Append node data to graph_nodes list
+        graph_nodes.append(node_data)
+
+        # Generate edge data
+        if row['Подразделение']:
+            edge_data = {'data': {'source': row['ЮЛ'], 'target': row['Подразделение']}}
+            graph_edges.append(edge_data)
+
+        if row['Отдел']:
+            edge_data = {'data': {'source': row['Подразделение'], 'target': row['Отдел']}}
+            graph_edges.append(edge_data)
+
+        if row['Группа']:
+            edge_data = {'data': {'source': row['Отдел'], 'target': row['Группа']}}
+            graph_edges.append(edge_data)
+
+        edge_data = {'data': {'source': row['Группа'], 'target': row['Номер позиции']}}
+        graph_edges.append(edge_data)
+
+    # Combine nodes and edges
+    graph_data = graph_nodes + graph_edges
+
+    return graph_data
+
+
+@callback(
+    Output('cytoscape-org-graph', 'elements'),
+    Input('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    Input('button-1', 'n_clicks')
+)
+def update_graph(contents, filename, last_modified, button_1_clicks):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if trigger_id == 'upload-data':
+        if contents is None:
+            raise PreventUpdate
+
+        content_type, content_string = contents[0].split(',')
+
+        decoded = base64.b64decode(content_string).decode('utf-8')
+
+        try:
+            # Generate graph data from the uploaded CSV content
+            elements = csv_handling.generate_graph_data_from_csv(decoded)
+            return elements
+        except Exception as e:
+            print(e)
+            return dbc.Alert("There was an error processing the file.", color="danger")
+
+    elif trigger_id == 'button-1':
+        return csv_handling.test_graph_data2
+
+    raise PreventUpdate
 
 
 # Define Dash callbacks
@@ -164,23 +224,28 @@ def displaySelectedNodeData(data_list):
     cities_list = [data['label'] for data in data_list]
     return "You selected the following cities: " + "\n* ".join(cities_list)
 
-
-# Add callback to handle file upload
-@callback(
-    Output('cytoscape-org-graph', 'elements'),
-    Input('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    prevent_initial_call=True
-)
-def update_graph(contents, filename):
-    if contents is None:
-        raise PreventUpdate
-
-    content_type, content_string = contents.split(',')
-
-    decoded = base64.b64decode(content_string)
-
-    # Call method from csv_handling.py to generate nodes
-    nodes = csv_handling.generate_graph_data_from_csv(decoded.decode('utf-8'))
-
-    return nodes
+# Handle file upload and load it into a graph
+# @callback(
+#     Output('cytoscape-org-graph', 'elements'),
+#     Input('upload-data', 'contents'),
+#     State('upload-data', 'filename'),
+#     State('upload-data', 'last_modified')
+# )
+# def update_graph(contents, filename, last_modified):
+#     if contents is None:
+#         raise PreventUpdate
+#
+#     content_type, content_string = contents.split(',')
+#
+#     decoded = base64.b64decode(content_string).decode('utf-8')
+#
+#     try:
+#         if 'csv' in filename:
+#             # Generate graph data from the uploaded CSV content
+#             elements = csv_handling.generate_graph_data_from_csv(decoded)
+#             return elements
+#     except Exception as e:
+#         print(e)
+#         return dbc.Alert("There was an error processing the file.", color="danger")
+#
+#     raise PreventUpdate
