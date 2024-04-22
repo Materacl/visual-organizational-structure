@@ -1,7 +1,7 @@
 import dash_cytoscape as cyto
 
 
-def get_tree_graph(graph_elements=None):
+def get_tree_graph(graph_roots=None, graph_elements=None):
     """
     Create and return a Cytoscape tree graph with specified layout and style.
 
@@ -17,7 +17,7 @@ def get_tree_graph(graph_elements=None):
         # Layout configuration
         layout={
             'name': 'breadthfirst',  # Use 'breadthfirst' layout algorithm
-            'roots': '[id = "LE1"]',  # Root node
+            'roots': '[id = "LE0"]',  # Root node
             'idealEdgeLength': 100,
             'nodeOverlap': 20,
             'refresh': 20,

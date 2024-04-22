@@ -64,7 +64,7 @@ def layout(dashboard_id=None):
         )
 
     return html.Div([
-        get_tree_graph([]),
+        get_tree_graph([], []),
         dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -95,51 +95,6 @@ def layout(dashboard_id=None):
 
         node_info_collapse
     ])
-
-
-def generate_graph_data_from_csv(csv_content):
-    # Read the CSV string into a DataFrame
-    df = pd.read_csv(io.StringIO(csv_content))
-
-    # Initialize lists to store nodes and edges
-    graph_nodes = []
-    graph_edges = []
-
-    # Iterate over the rows in the DataFrame to generate nodes
-    for index, row in df.iterrows():
-        # Generate node data
-        node_data = {
-            'data': {
-                'id': row['Номер позиции'],
-                'label': row['ФИО'] if row['ФИО'] != 'Вакансия' else row['Должность'],
-                'job_title': row['Должность'],
-                'job_type': row['Тип работы']
-            }
-        }
-
-        # Append node data to graph_nodes list
-        graph_nodes.append(node_data)
-
-        # Generate edge data
-        if row['Подразделение']:
-            edge_data = {'data': {'source': row['ЮЛ'], 'target': row['Подразделение']}}
-            graph_edges.append(edge_data)
-
-        if row['Отдел']:
-            edge_data = {'data': {'source': row['Подразделение'], 'target': row['Отдел']}}
-            graph_edges.append(edge_data)
-
-        if row['Группа']:
-            edge_data = {'data': {'source': row['Отдел'], 'target': row['Группа']}}
-            graph_edges.append(edge_data)
-
-        edge_data = {'data': {'source': row['Группа'], 'target': row['Номер позиции']}}
-        graph_edges.append(edge_data)
-
-    # Combine nodes and edges
-    graph_data = graph_nodes + graph_edges
-
-    return graph_data
 
 
 @callback(
