@@ -166,6 +166,7 @@ header {
   right: 0;
 }
 .select-menu .options {
+  
   right: 0;
   display: flex;
   flex-direction: column;
@@ -179,6 +180,7 @@ header {
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
  
 }
 .select-menu .options .option {
