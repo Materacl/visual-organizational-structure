@@ -169,3 +169,7 @@ def delete_dashboard(dashboard_id):
     flash('Dashboard deleted successfully!')
 
     return redirect(url_for('home'))
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    return render_template('settings.jinja2')
