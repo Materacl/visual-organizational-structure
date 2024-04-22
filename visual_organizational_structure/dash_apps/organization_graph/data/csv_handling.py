@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import pandas as pd
 import json
 import io
@@ -144,101 +142,7 @@ def create_edge(source, target):
     }
 
 
-def create_node2(node_id, label, path):
-    return {
-        'data': {'id': node_id, 'label': label},
-        'path': path,
-    }
-
-
-def generate_graph_data_from_csv(csv_content: str) -> json:
-    # Read the CSV string into a DataFrame
-    csv_file = io.StringIO(csv_content)
-    df = pd.read_csv(csv_file).fillna('')
-
-    # Nodes
-    le_nodes = []
-    l_nodes = []
-    su_nodes = []
-    d_nodes = []
-    g_nodes = []
-    e_nodes = []
-
-    # Edges
-    l_edges = []
-    su_edges = []
-    d_edges = []
-    g_edges = []
-    e_edges = []
-
-    les = df[df["ЮЛ"] != ""]["ЮЛ"].unique()
-    i = 0
-    j = 0
-    k = 0
-    l = 0
-    m = 0
-    for le in les:
-        le_id = f"LE{i}"
-        le_nodes.append(create_node(le_id, le))
-        i += 1
-
-        le_df = df[df["ЮЛ"] == le]
-        locs = le_df["Локация"].unique().tolist()
-        for loc in locs:
-            l_id = f"L{j}"
-            l_nodes.append(create_node(l_id, loc))
-            l_edges.append(create_edge(le_id, l_id))
-            j += 1
-
-            loc_df = le_df[df["Локация"] == loc]
-            subunits = loc_df["Подразделение"][df["Подразделение"] != ""].unique().tolist()
-            for subunit in subunits:
-                su_id = f"SU{k}"
-                su_nodes.append(create_node(su_id, subunit))
-                su_edges.append(create_edge(l_id, su_id))
-                k += 1
-
-                subunit_df = loc_df[df["Подразделение"] == subunit]
-                departments = subunit_df["Отдел"][df["Отдел"] != ""].unique().tolist()
-                for department in departments:
-                    d_id = f"D{l}"
-                    d_nodes.append(create_node(d_id, department))
-                    d_edges.append(create_edge(su_id, d_id))
-                    l += 1
-
-                    department_df = subunit_df[df["Отдел"] == department]
-                    groups = department_df["Группа"][df["Группа"] != ""].unique().tolist()
-                    for group in groups:
-                        g_id = f"G{m}"
-                        g_nodes.append(create_node(g_id, group))
-                        g_edges.append(create_edge(d_id, g_id))
-                        m += 1
-
-                        group_df = department_df[df["Группа"] == group]
-                        employees = group_df[["Номер позиции", "Должность", "ФИО", "Тип работы"]]
-
-                        for employee in employees.itertuples(index=False):
-                            e_nodes.append(create_node_employee(
-                                employee[0],  # Номер позиции
-                                employee[2],  # ФИО
-                                employee[1],  # Должность
-                                employee[3]  # Тип работы
-                            ))
-                            e_edges.append(create_edge(g_id, employee[0]))
-
-                    nan_group_employees = department_df[df["Группа"] == ""][df["Отдел"] != ""][
-                        ["Номер позиции", "Должность", "ФИО", "Тип работы"]]
-                    print(nan_group_employees)
-
-            # nan_subunit_df = loc_df[df["Подразделение"] == ""]
-            # nan_subunits_departments = nan_subunit_df["Отдел"].unique().tolist()
-            # for nan_subunit in nan_subunit_df:
-            #     print(nan_subunit)
-
-    return le_nodes + l_nodes + l_edges + su_nodes + su_edges + d_nodes + d_edges + g_nodes + g_edges + e_nodes + e_edges
-
-
-def generate_graph_data_from_csv2(csv_content: str) -> json:
+def generate_graph_data_from_csv2(csv_content: str) -> list:
     # Read the CSV string into a DataFrame
     csv_file = io.StringIO(csv_content)
     df = pd.read_csv(csv_file).fillna('')
@@ -274,8 +178,8 @@ def generate_graph_data_from_csv2(csv_content: str) -> json:
     k = 0
     l = 0
     m = 0
-    for row in df.iterrows():
-        full_path = row[1][["ЮЛ", "Локация", "Подразделение", "Отдел", "Группа"]].tolist()
+    for _, row in df.iterrows():
+        full_path = row[["ЮЛ", "Локация", "Подразделение", "Отдел", "Группа"]].tolist()
 
         # Legal Entity
         le_path = full_path[0:1]
@@ -356,7 +260,7 @@ def generate_graph_data_from_csv2(csv_content: str) -> json:
                     g_edges.append(create_edge(parent_id, g_id))
 
         # Employees
-        employee_data = row[1][["Номер позиции", "Должность", "ФИО", "Тип работы"]].tolist()
+        employee_data = row[["Номер позиции", "Должность", "ФИО", "Тип работы"]].tolist()
         e_nodes.append(create_node_employee(employee_data[0], employee_data[2], employee_data[1], employee_data[3]))
         s = len(full_path) - 1
         while full_path[s] == "" and s > 0:

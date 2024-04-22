@@ -1,15 +1,8 @@
-import base64
-import datetime
-import io
-
-import pandas as pd
-
-import dash
-from dash import html, dcc, Input, Output, callback, State, dash_table
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 
 from flask_login import current_user
+from visual_organizational_structure import db
 from visual_organizational_structure.models import Dashboard
 
 from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph
@@ -20,10 +13,7 @@ from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
 import dash
 
 import base64
-import datetime
-import io
-
-import pandas as pd
+import json
 
 # Register the Dash app page
 dash.register_page(
@@ -62,39 +52,45 @@ def layout(dashboard_id=None):
                 'font-size': '2em'
             }
         )
+    else:
+        data = dashboard.graph_data
+        if data:
+            graph_elements = json.loads(data)
+        else:
+            graph_elements = []
+        return html.Div(
+            [
+                get_tree_graph([], graph_elements),
+                dcc.Upload(
+                    id='upload-data',
+                    children=html.Div([
+                        'Drag and Drop or ',
+                        html.A('Select Files')
+                    ]),
+                    style={
+                        'width': '100%',
+                        'height': '60px',
+                        'lineHeight': '60px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'margin': '10px'
+                    },
+                    # Allow multiple files to be uploaded
+                    multiple=False
+                ),
+                dbc.ButtonGroup([
+                    dbc.Button('Button 1', id='button-1', n_clicks=0),
+                    dbc.Button('Button 2', id='button-2', n_clicks=0)
+                ],
+                    style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'},
+                    size="md",
+                    vertical=True,
+                ),
 
-    return html.Div([
-        get_tree_graph([], []),
-        dcc.Upload(
-            id='upload-data',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
-            style={
-                'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            # Allow multiple files to be uploaded
-            multiple=True
-        ),
-        dbc.ButtonGroup([
-            dbc.Button('Button 1', id='button-1', n_clicks=0),
-            dbc.Button('Button 2', id='button-2', n_clicks=0)
-        ],
-            style={'position': 'absolute', 'top': '50%', 'left': '10px', 'transform': 'translateY(-50%)'},
-            size="md",
-            vertical=True,
-        ),
-
-        node_info_collapse
-    ])
+                node_info_collapse
+            ], id="page_layout", title=dashboard_id)
 
 
 @callback(
@@ -102,35 +98,31 @@ def layout(dashboard_id=None):
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
-    Input('button-1', 'n_clicks')
+    State('page_layout', 'title')
 )
-def update_graph(contents, filename, last_modified, button_1_clicks):
-    ctx = dash.callback_context
-    if not ctx.triggered:
+def update_graph(contents, filename, last_modified, title):
+    if contents is None:
         raise PreventUpdate
 
-    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    content_type, content_string = contents.split(',')
 
-    if trigger_id == 'upload-data':
-        if contents is None:
-            raise PreventUpdate
+    decoded = base64.b64decode(content_string).decode('utf-8')
 
-        content_type, content_string = contents[0].split(',')
+    try:
+        # Generate graph data from the uploaded CSV content
+        elements = csv_handling.generate_graph_data_from_csv2(decoded)
 
-        decoded = base64.b64decode(content_string).decode('utf-8')
+        # Save the CSV data to the Dashboard model
+        dashboard = Dashboard.query.get(title)
+        print(dashboard.id)
+        dashboard.graph_data = json.dumps(elements)
 
-        try:
-            # Generate graph data from the uploaded CSV content
-            elements = csv_handling.generate_graph_data_from_csv2(decoded)
-            return elements
-        except Exception as e:
-            print(e)
-            return dbc.Alert("There was an error processing the file.", color="danger")
+        db.session.commit()
 
-    elif trigger_id == 'button-1':
-        return csv_handling.test_graph_data2
-
-    raise PreventUpdate
+        return elements
+    except Exception as e:
+        print(e)
+        return dbc.Alert("There was an error processing the file.", color="danger")
 
 
 # Define Dash callbacks
@@ -178,29 +170,3 @@ def displaySelectedNodeData(data_list):
 
     cities_list = [data['label'] for data in data_list]
     return "You selected the following cities: " + "\n* ".join(cities_list)
-
-# Handle file upload and load it into a graph
-# @callback(
-#     Output('cytoscape-org-graph', 'elements'),
-#     Input('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified')
-# )
-# def update_graph(contents, filename, last_modified):
-#     if contents is None:
-#         raise PreventUpdate
-#
-#     content_type, content_string = contents.split(',')
-#
-#     decoded = base64.b64decode(content_string).decode('utf-8')
-#
-#     try:
-#         if 'csv' in filename:
-#             # Generate graph data from the uploaded CSV content
-#             elements = csv_handling.generate_graph_data_from_csv(decoded)
-#             return elements
-#     except Exception as e:
-#         print(e)
-#         return dbc.Alert("There was an error processing the file.", color="danger")
-#
-#     raise PreventUpdate
