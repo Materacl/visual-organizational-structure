@@ -121,7 +121,7 @@ def update_graph(contents, filename, last_modified, button_1_clicks):
 
         try:
             # Generate graph data from the uploaded CSV content
-            elements = csv_handling.generate_graph_data_from_csv(decoded)
+            elements = csv_handling.generate_graph_data_from_csv2(decoded)
             return elements
         except Exception as e:
             print(e)

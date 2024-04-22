@@ -144,6 +144,13 @@ def create_edge(source, target):
     }
 
 
+def create_node2(node_id, label, path):
+    return {
+        'data': {'id': node_id, 'label': label},
+        'path': path,
+    }
+
+
 def generate_graph_data_from_csv(csv_content: str) -> json:
     # Read the CSV string into a DataFrame
     csv_file = io.StringIO(csv_content)
@@ -209,7 +216,6 @@ def generate_graph_data_from_csv(csv_content: str) -> json:
 
                         group_df = department_df[df["Группа"] == group]
                         employees = group_df[["Номер позиции", "Должность", "ФИО", "Тип работы"]]
-                        print(employees)
 
                         for employee in employees.itertuples(index=False):
                             e_nodes.append(create_node_employee(
@@ -220,7 +226,9 @@ def generate_graph_data_from_csv(csv_content: str) -> json:
                             ))
                             e_edges.append(create_edge(g_id, employee[0]))
 
-
+                    nan_group_employees = department_df[df["Группа"] == ""][df["Отдел"] != ""][
+                        ["Номер позиции", "Должность", "ФИО", "Тип работы"]]
+                    print(nan_group_employees)
 
             # nan_subunit_df = loc_df[df["Подразделение"] == ""]
             # nan_subunits_departments = nan_subunit_df["Отдел"].unique().tolist()
@@ -230,5 +238,133 @@ def generate_graph_data_from_csv(csv_content: str) -> json:
     return le_nodes + l_nodes + l_edges + su_nodes + su_edges + d_nodes + d_edges + g_nodes + g_edges + e_nodes + e_edges
 
 
-if __name__ == "__main__":
-    print(generate_graph_data_from_csv(data))
+def generate_graph_data_from_csv2(csv_content: str) -> json:
+    # Read the CSV string into a DataFrame
+    csv_file = io.StringIO(csv_content)
+    df = pd.read_csv(csv_file).fillna('')
+    df = df[df["Номер позиции"] != ""]
+
+    # Nodes
+    le_nodes = []
+    l_nodes = []
+    su_nodes = []
+    d_nodes = []
+    g_nodes = []
+    e_nodes = []
+
+    # Edges
+    l_edges = []
+    su_edges = []
+    d_edges = []
+    g_edges = []
+    e_edges = []
+
+    # Paths
+    paths = {}
+    le_paths = {}
+    l_paths = {}
+    su_paths = {}
+    d_paths = {}
+    g_paths = {}
+
+    nodes = []
+
+    i = 0
+    j = 0
+    k = 0
+    l = 0
+    m = 0
+    for row in df.iterrows():
+        full_path = row[1][["ЮЛ", "Локация", "Подразделение", "Отдел", "Группа"]].tolist()
+
+        # Legal Entity
+        le_path = full_path[0:1]
+        if le_path not in le_paths.values():
+            le_id = f"LE{i}"
+            le_nodes.append(create_node(le_id, le_path[-1]))
+            le_paths[le_id] = le_path
+            paths[le_id] = le_path
+            i += 1
+
+        # Locations
+        l_path = full_path[0:2]
+        if l_path not in l_paths.values():
+            l_id = f"L{j}"
+            l_nodes.append(create_node(l_id, l_path[-1]))
+            l_paths[l_id] = l_path
+            paths[l_id] = l_path
+            j += 1
+
+            s = 2
+            while l_path[-1 * s] == "" and s < len(l_path):
+                s += 1
+            parent_path = l_path[:-1 * s + 1]
+            for parent_id, path in paths.items():
+                if path == parent_path:
+                    su_edges.append(create_edge(parent_id, l_id))
+
+        # Subinits
+        su_path = full_path[0:3]
+        if su_path not in su_paths.values() and su_path[-1] != "":
+            su_id = f"SU{k}"
+            su_nodes.append(create_node(su_id, su_path[-1]))
+            su_paths[su_id] = su_path
+            paths[su_id] = su_path
+            k += 1
+
+            s = 2
+            while su_path[-1 * s] == "" and s < len(su_path):
+                s += 1
+            parent_path = su_path[:-1 * s + 1]
+            for parent_id, path in paths.items():
+                if path == parent_path:
+                    su_edges.append(create_edge(parent_id, su_id))
+
+        # Departmets
+        d_path = full_path[0:4]
+        if d_path not in d_paths.values() and d_path[-1] != "":
+            d_id = f"D{l}"
+            d_nodes.append(create_node(d_id, d_path[-1]))
+            d_paths[d_id] = d_path
+            paths[d_id] = d_path
+            l += 1
+
+            s = 2
+            while d_path[-1 * s] == "" and s < len(d_path):
+                s += 1
+            parent_path = d_path[:-1 * s + 1]
+            for parent_id, path in paths.items():
+                if path == parent_path:
+                    d_edges.append(create_edge(parent_id, d_id))
+
+        # Groups
+        g_path = full_path[0:5]
+        if g_path not in g_paths.values() and g_path[-1] != "":
+            g_id = f"G{m}"
+            g_nodes.append(create_node(g_id, g_path[-1]))
+            g_paths[g_id] = g_path
+            paths[g_id] = g_path
+            m += 1
+
+            s = 2
+            while g_path[-1 * s] == "" and s < len(g_path):
+                s += 1
+
+            parent_path = g_path[:-1 * s + 1]
+            for parent_id, path in paths.items():
+                if path == parent_path:
+                    g_edges.append(create_edge(parent_id, g_id))
+
+        # Employees
+        employee_data = row[1][["Номер позиции", "Должность", "ФИО", "Тип работы"]].tolist()
+        e_nodes.append(create_node_employee(employee_data[0], employee_data[2], employee_data[1], employee_data[3]))
+        s = len(full_path) - 1
+        while full_path[s] == "" and s > 0:
+            s -= 1
+
+        parent_path = full_path[:s + 1]
+        for parent_id, path in paths.items():
+            if path == parent_path:
+                e_edges.append(create_edge(parent_id, employee_data[0]))
+
+    return le_nodes + l_nodes + l_edges + su_nodes + su_edges + d_nodes + d_edges + g_nodes + g_edges + e_nodes + e_edges
