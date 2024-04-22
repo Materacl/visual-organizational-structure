@@ -1,4 +1,6 @@
 import dash_cytoscape as cyto
+import dash_bootstrap_components as dbc
+from dash import dcc
 
 stylesheet1 = [
     {
@@ -82,6 +84,7 @@ stylesheet2 = [
     }
 ]
 
+
 def get_tree_graph(graph_roots=None, graph_elements=None):
     """
     Create and return a Cytoscape tree graph with specified layout and style.
@@ -120,3 +123,29 @@ def get_tree_graph(graph_roots=None, graph_elements=None):
         # Stylesheet configuration
         stylesheet=stylesheet2
     )
+
+
+dashboard_menu_buttons = dbc.ButtonGroup(
+    [
+        dbc.Button('Button 1', id='button-1', n_clicks=0),
+        dbc.Button('Button 2', id='button-2', n_clicks=0)
+    ],
+    style={
+        'position': 'absolute',
+        'top': '50%',
+        'left': '10px',
+        'transform': 'translateY(-50%)'
+    },
+    size="md",
+    vertical=True,
+)
+
+layout_choose = dcc.Dropdown(
+    id='dropdown-update-layout',
+    value='breadthfirst',
+    clearable=False,
+    options=[
+        {'label': name.capitalize(), 'value': name}
+        for name in ['breadthfirst', 'random']
+    ]
+)
