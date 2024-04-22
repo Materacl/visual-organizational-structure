@@ -78,6 +78,44 @@ def logout():
     return redirect(url_for('home'))
 
 
+@app.route('/confirm_change_password', methods=['GET', 'POST'])
+def confirm_change_password():
+    old_password = request.form.get('old_password')
+    if old_password:
+        user = User.query.filter_by(login=current_user.login).first()
+        if user and check_password_hash(user.password, old_password):
+            flag = True
+            return change_password(flag)
+        else:
+            flash("Пароль не подходит")
+    else:
+        flash("Заполните все поля!")
+
+    return render_template('confirm_change_password.jinja2')
+
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password(flag=False):
+    if flag:
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+        user = User.query.filter_by(login=current_user.login).first()
+        if password and password2:
+            if password == password2:
+                user.password = generate_password_hash(password)
+                db.session.commit()
+                logout()
+                return redirect(url_for('login'))
+            else:
+                flash("Пароли не совпадают")
+        else:
+            flash("Заполните все поля!")
+
+        return render_template('change_password.jinja2')
+    else:
+        flash("Нет доступа!")
+
+
 @app.after_request
 def redirect_to_signin(response):
     if response.status == 401:
