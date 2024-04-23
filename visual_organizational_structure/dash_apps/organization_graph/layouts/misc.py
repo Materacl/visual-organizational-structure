@@ -3,7 +3,7 @@ from dash import dcc, html
 
 dashboard_menu_buttons = dbc.ButtonGroup(
     [
-        dbc.Button('Button 1', id='button-1', n_clicks=0),
+        dbc.Button('Загрузить файл', id='button-1', n_clicks=0),
         dbc.Button('Button 2', id='button-2', n_clicks=0)
     ],
     style={

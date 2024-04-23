@@ -35,8 +35,7 @@ def layout(dashboard_id=None):
             get_tree_graph([], graph_elements),
             show_csv_uploader(state),
             dashboard_menu_buttons,
-            node_info_collapse,
-            layout_choose
+            node_info_collapse
         ]
     )
 
