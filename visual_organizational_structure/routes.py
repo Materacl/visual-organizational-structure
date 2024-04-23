@@ -23,10 +23,10 @@ def home():
     )
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    login = request.form.get("login")
-    password = request.form.get("password")
+    login = request.form.get('login')
+    password = request.form.get('password')
 
     if login and password:
         user = User.query.filter_by(login=login).first()
@@ -59,7 +59,6 @@ def register():
             new_user = User(login=login, password=hash_pwd)
             db.session.add(new_user)
             db.session.commit()
-
             return redirect(url_for("login"))
 
     return render_template("register.jinja2")
@@ -113,43 +112,42 @@ def change_password(flag=False):
 @app.after_request
 def redirect_to_signin(response):
     if response.status == 401:
-        return redirect(url_for("login") + "?next=" + request.url)
+        return redirect(url_for('login') + '?next=' + request.url)
     return response
 
 
-@app.route("/create_dashboard", methods=["POST"])
+@app.route('/create_dashboard', methods=['POST'])
 @login_required
 def create_dashboard():
-    name = request.form.get("name")
-
+    name = request.form.get('name')
     if name:
         new_dashboard = Dashboard(name=name, user_id=current_user.id)
         db.session.add(new_dashboard)
         db.session.commit()
-        flash("Dashboard created successfully!")
+        flash('Dashboard created successfully!')
 
         # Redirect to the new dashboard's URL
-        return redirect(url_for("view_dashboard", dashboard_id=new_dashboard.id))
+        return redirect(url_for('view_dashboard', dashboard_id=new_dashboard.id))
     else:
-        flash("Name is required for the dashboard")
+        flash('Name is required for the dashboard')
 
-    return redirect(url_for("home"))
+    return redirect(url_for('home'))
 
 
-@app.route("/dashboard/<int:dashboard_id>")
+@app.route('/dashboard/<int:dashboard_id>')
 @login_required
 def view_dashboard(dashboard_id):
     dashboard = Dashboard.query.get(dashboard_id)
 
     if dashboard.user_id != current_user.id:
-        flash("Unauthorized access")
-        return redirect(url_for("home"))
+        flash('Unauthorized access')
+        return redirect(url_for('home'))
 
     # Redirect to the correct URL
-    return redirect(f"org-structure/{dashboard_id}")
+    return redirect(f'org-structure/{dashboard_id}')
 
 
-@app.route("/delete_dashboard/<int:dashboard_id>", methods=["POST"])
+@app.route('/delete_dashboard/<int:dashboard_id>', methods=['POST'])
 @login_required
 def delete_dashboard(dashboard_id):
     dashboard = Dashboard.query.get(dashboard_id)

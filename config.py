@@ -20,5 +20,5 @@ class Config:
 
     # Static Assets
     STATIC_FOLDER = "static"
-    TEMPLATES_FOLDER = "templates"
+    TEMPLATES_FOLDER = "layouts"
     COMPRESSOR_DEBUG = environ.get("COMPRESSOR_DEBUG")

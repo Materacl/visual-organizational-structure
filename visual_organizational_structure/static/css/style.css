@@ -9,8 +9,7 @@ body {
 }
 
 a {
-    text-decoration: none;
-    /* Remove underlining from all links */
+    text-decoration: none; /* Remove underlining from all links */
 }
 
 
@@ -142,7 +141,6 @@ header {
 
 .register-photo:hover {
     transform: scale(1.2);
-    
 }
 
 /*dd*/
@@ -395,10 +393,8 @@ article:hover {
 
 .dash-cards {
     display: flex;
-    align-items: center;
-    /* Center items vertically */
-    justify-content: left;
-    /* Center items horizontally */
+    align-items: center; /* Center items vertically */
+    justify-content: left; /* Center items horizontally */
     gap: 25px;
     flex-wrap: wrap;
 }
