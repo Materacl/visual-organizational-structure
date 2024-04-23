@@ -33,43 +33,80 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(user)
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('home'))
+            next_page = request.args.get("next")
+            return redirect(next_page or url_for("home"))
         else:
-            flash('Логин или пароль некорректны')
+            flash("Логин или пароль некорректны")
     else:
-        flash('Введите логин и пароль')
+        flash("Введите логин и пароль")
 
-    return render_template('login.jinja2')
+    return render_template("login.jinja2")
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    login = request.form.get('login')
-    password = request.form.get('password')
-    password2 = request.form.get('password2')
+    login = request.form.get("login")
+    password = request.form.get("password")
+    password2 = request.form.get("password2")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         if not (login and password and password2):
-            flash('Заполните все поля')
+            flash("Заполните все поля")
         elif password != password2:
-            flash('Пароли не совпадают')
+            flash("Пароли не совпадают")
         else:
             hash_pwd = generate_password_hash(password)
             new_user = User(login=login, password=hash_pwd)
             db.session.add(new_user)
             db.session.commit()
+            return redirect(url_for("login"))
 
-            return redirect(url_for('login'))
-
-    return render_template('register.jinja2')
+    return render_template("register.jinja2")
 
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for("home"))
+
+
+@app.route("/confirm_change_password", methods=["GET", "POST"])
+def confirm_change_password():
+    old_password = request.form.get("old_password")
+    if old_password:
+        user = User.query.filter_by(login=current_user.login).first()
+        if user and check_password_hash(user.password, old_password):
+            flag = True
+            return change_password(flag)
+        else:
+            flash("Пароль не подходит")
+    else:
+        flash("Заполните все поля!")
+
+    return render_template("confirm_change_password.jinja2")
+
+
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password(flag=False):
+    if flag:
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        user = User.query.filter_by(login=current_user.login).first()
+        if password and password2:
+            if password == password2:
+                user.password = generate_password_hash(password)
+                db.session.commit()
+                logout()
+                return redirect(url_for("login"))
+            else:
+                flash("Пароли не совпадают")
+        else:
+            flash("Заполните все поля!")
+
+        return render_template("change_password.jinja2")
+    else:
+        flash("Нет доступа!")
 
 
 @app.after_request
@@ -83,7 +120,6 @@ def redirect_to_signin(response):
 @login_required
 def create_dashboard():
     name = request.form.get('name')
-
     if name:
         new_dashboard = Dashboard(name=name, user_id=current_user.id)
         db.session.add(new_dashboard)
@@ -117,11 +153,16 @@ def delete_dashboard(dashboard_id):
     dashboard = Dashboard.query.get(dashboard_id)
 
     if dashboard.user_id != current_user.id:
-        flash('Unauthorized access')
-        return redirect(url_for('home'))
+        flash("Unauthorized access")
+        return redirect(url_for("home"))
 
     db.session.delete(dashboard)
     db.session.commit()
-    flash('Dashboard deleted successfully!')
+    flash("Dashboard deleted successfully!")
 
-    return redirect(url_for('home'))
+    return redirect(url_for("home"))
+
+
+@app.route("/settings", methods=["GET", "POST"])
+def settings():
+    return render_template("settings.jinja2")
