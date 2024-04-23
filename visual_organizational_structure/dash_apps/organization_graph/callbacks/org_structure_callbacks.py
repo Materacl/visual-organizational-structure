@@ -4,35 +4,64 @@ from visual_organizational_structure.models import Dashboard
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 import base64
 import json
-from dash import Input, Output, State, callback
+from dash import html, Input, Output, ctx, callback, callback_context
 import dash_bootstrap_components as dbc
-from dash import html
+
+
+@callback(
+    Output("uploader-csv", "is_open"),
+    [Input("confirm-csv-uploader", "n_clicks"),
+     Input("button-1", "n_clicks"),
+     Input("upload-data", "filename"),
+     Input("dashboard-data", 'data')],
+)
+def toggle_modal(confirm_clicks, open_modal_clicks, filename, data):
+    if "confirm-csv-uploader" == ctx.triggered_id and filename:
+        print(2)
+        return False
+    elif "button-1" == ctx.triggered_id:
+        print(3)
+        return True
+    elif data["state"]:
+        print(1)
+        return True
+
+
+@callback(
+    Output('filename-display', 'children'),
+    Input("upload-data", "filename"),
+)
+def update_scv_uploader(filename):
+    return filename
 
 
 @callback(
     [Output('cytoscape-org-graph', 'elements'),
-     Output('csv_uploader', 'is_open')],
+     Output("dashboard-data", 'data')],
     [Input('upload-data', 'contents'),
-     Input('upload-data', 'filename'),
-     Input('upload-data', 'last_modified'),
-     Input('page_layout', 'title')]
+     Input('cytoscape-org-graph', 'elements'),
+     Input('confirm-csv-uploader', 'n_clicks'),
+     Input("dashboard-data", 'data')],
 )
-def update_graph(contents, filename, last_modified, title):
-    if contents is None:
-        raise PreventUpdate
+def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_data):
+    if "confirm-csv-uploader" == ctx.triggered_id:
+        if contents is None:
+            raise PreventUpdate
 
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string).decode('utf-8')
+        content_type, content_string = contents.split(',')
+        decoded = base64.b64decode(content_string).decode('utf-8')
 
-    try:
-        elements = csv_handling.generate_graph_data_from_csv2(decoded)
-        dashboard = Dashboard.query.get(title)
-        dashboard.graph_data = json.dumps(elements)
-        db.session.commit()
-        return elements, False
-    except Exception as e:
-        print(e)
-        return dbc.Alert("There was an error processing the file.", color="danger")
+        try:
+            elements = csv_handling.generate_graph_data_from_csv2(decoded)
+            dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+            dashboard.graph_data = json.dumps(elements)
+            db.session.commit()
+            return elements, {"state": False, "dashboard_id": dashboard_data["dashboard_id"]}
+        except Exception as e:
+            print(e)
+            return dbc.Alert("There was an error processing the file.", color="danger")
+    else:
+        return current_contents, {"state": True, "dashboard_id": dashboard_data["dashboard_id"]}
 
 
 @callback(

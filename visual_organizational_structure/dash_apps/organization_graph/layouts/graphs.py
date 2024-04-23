@@ -1,6 +1,6 @@
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
-from dash import dcc
+from dash import dcc, html
 
 stylesheet1 = [
     {
@@ -125,19 +125,16 @@ def get_tree_graph(graph_roots=None, graph_elements=None):
     )
 
 
-dashboard_menu_buttons = dbc.ButtonGroup(
-    [
-        dbc.Button('Button 1', id='button-1', n_clicks=0),
-        dbc.Button('Button 2', id='button-2', n_clicks=0)
-    ],
-    style={
-        'position': 'absolute',
-        'top': '50%',
-        'left': '10px',
-        'transform': 'translateY(-50%)'
-    },
-    size="md",
-    vertical=True,
+node_info_collapse = dbc.Collapse(
+    dbc.Card(
+        [
+            dbc.CardHeader("Node Information"),
+            dbc.CardBody(html.Div(id='node-info-content'))
+        ]
+    ),
+    id='node-info-collapse',
+    is_open=False,
+    style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
 )
 
 layout_choose = dcc.Dropdown(

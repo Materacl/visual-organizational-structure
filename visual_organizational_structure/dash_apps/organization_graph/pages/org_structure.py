@@ -1,8 +1,8 @@
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
-from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph, dashboard_menu_buttons, layout_choose
-from visual_organizational_structure.dash_apps.organization_graph.layouts.misc import csv_uploader, node_info_collapse
-from dash import html
+from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph, node_info_collapse, layout_choose
+from visual_organizational_structure.dash_apps.organization_graph.layouts.misc import show_csv_uploader, dashboard_menu_buttons
+from dash import html, dcc
 import dash
 import json
 import visual_organizational_structure.dash_apps.organization_graph.callbacks.org_structure_callbacks
@@ -22,18 +22,22 @@ def layout(dashboard_id=None):
     if not dashboard or dashboard.user_id != current_user.id:
         return unauthorized_layout()
 
-    graph_elements = json.loads(dashboard.graph_data) if dashboard.graph_data else []
+    if dashboard.graph_data:
+        graph_elements = json.loads(dashboard.graph_data)
+        state = False
+    else:
+        graph_elements = []
+        state = True
 
     return html.Div(
         [
+            dcc.Store(id="dashboard-data", data={"state": state, "dashboard_id": dashboard_id}),
             get_tree_graph([], graph_elements),
-            csv_uploader,
+            show_csv_uploader(state),
             dashboard_menu_buttons,
             node_info_collapse,
             layout_choose
-        ],
-        id="page_layout",
-        title=dashboard_id
+        ]
     )
 
 
