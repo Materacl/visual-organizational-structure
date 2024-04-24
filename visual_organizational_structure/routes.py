@@ -124,12 +124,11 @@ def create_dashboard():
         new_dashboard = Dashboard(name=name, user_id=current_user.id)
         db.session.add(new_dashboard)
         db.session.commit()
-        flash('Dashboard created successfully!')
 
         # Redirect to the new dashboard's URL
         return redirect(url_for('view_dashboard', dashboard_id=new_dashboard.id))
     else:
-        flash('Name is required for the dashboard')
+        pass
 
     return redirect(url_for('home'))
 
