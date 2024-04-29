@@ -1,0 +1,77 @@
+{% extends "layout.jinja2" %}
+{% block title %}<title>Главная страница</title>{% endblock %}
+{% block content %}
+
+<div class="main-dash">
+    {% if current_user.is_authenticated %}
+    <article class="dash-cards">
+        {% for dashboard in current_user.dashboards %}
+        <span>
+            <div class="dash-card" data-id="{{ dashboard.id }}">
+                <a href="/dashboard/{{ dashboard.id }}">
+                    <figure>
+                        <img src="#" alt="" class="dash">
+                        <p class="dash-text">{{ dashboard.name }}</p>
+                        <form action="/delete_dashboard/{{ dashboard.id }}" method="post">
+                            <button type="submit">Delete {{ dashboard.name }}</button>
+                        </form>
+                    </figure>
+                </a>
+                <br />
+            </div>
+        </span>
+
+        {% endfor %}
+        <span>
+            <div class="dash-card" id="create-dashboard-card">
+                <a href="#" id="show-create-form-btn">
+                    <figure>
+                        <img src="#" alt="" class="dash">
+                        <p class="dash-create-text" id="create-dashboard-text">Создать доску</p>
+                    </figure>
+                </a>
+                <form class="create-dashboard-form" id="create-dashboard-form" action="/create_dashboard" method="post"
+                    style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <input type="text" name="name" placeholder="Dashboard name">
+                    <input type="submit" value="Create Dashboard">
+                </form>
+            </div>
+        </span>
+    </article>
+
+    {% else %}
+    <p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
+    {% endif %}
+</div>
+
+<script>
+    // JavaScript to toggle the create dashboard form and text
+    document.addEventListener('DOMContentLoaded', function () {
+        const showCreateFormBtn = document.getElementById('show-create-form-btn');
+        const createDashboardForm = document.getElementById('create-dashboard-form');
+        const createDashboardText = document.getElementById('create-dashboard-text');
+
+        showCreateFormBtn.addEventListener('click', function (event) {
+            event.preventDefault();  // Prevent the default action of the anchor tag
+            if (createDashboardForm.style.display === 'none' || !createDashboardForm.style.display) {
+                createDashboardForm.style.display = 'block';
+                createDashboardForm.style.opacity = '1'; // Ensure form is visible
+            } else {
+                createDashboardForm.style.display = 'none';
+                createDashboardForm.style.opacity = '0'; // Hide form
+                createDashboardText.textContent = 'Создать доску';
+            }
+        });
+
+        // Close the form when clicked outside of it
+        document.addEventListener('click', function (event) {
+            if (!createDashboardForm.contains(event.target) && !showCreateFormBtn.contains(event.target)) {
+                createDashboardForm.style.display = 'none';
+                createDashboardForm.style.opacity = '0';
+                createDashboardText.textContent = 'Создать доску';
+            }
+        });
+    });
+</script>
+
+{% endblock %}

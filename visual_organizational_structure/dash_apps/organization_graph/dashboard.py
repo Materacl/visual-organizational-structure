@@ -2,11 +2,12 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
+
 def init_dashboard(server):
     """Create a Plotly Dash dashboard."""
     APP_TITLE = "VOS"
     dash_app = dash.Dash(
-         __name__,
+        __name__,
         title=APP_TITLE,
         server=server,
         use_pages=True,
@@ -21,12 +22,22 @@ def init_dashboard(server):
     )
 
     # Create Dash Layout
-    dash_app.layout = dcc.Loading(
+    dash_app.layout = dbc.Spinner(
         [
-            html.A('Home', href='/'),
-            html.H1('Visual Organizational Structure'),
-            dash.page_container
-        ], 
+            dash.page_container,
+            html.A(
+                [
+                    html.I(className='bi bi-house-door', style={'fontSize': '24px', 'color': 'black'}),
+                ],
+                href='/', style={
+                    'position': 'absolute',
+                    'top': '25px',
+                    'left': '15px',
+                    'transform': 'translateY(-50%)'
+                }
+            ),
+        ],
+        spinner_style={"width": "3rem", "height": "3rem"},
         id='dash-container',
         color='primary',
         fullscreen=True

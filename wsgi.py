@@ -1,5 +1,5 @@
 """Application entry point."""
-from main_app import init_app
+from visual_organizational_structure import init_app
 
 app = init_app()
 
