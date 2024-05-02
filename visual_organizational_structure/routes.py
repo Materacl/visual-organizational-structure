@@ -3,9 +3,11 @@ from flask import current_app as app, current_app
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Message
 
-from visual_organizational_structure import db
+from visual_organizational_structure import db, mail
 from visual_organizational_structure.models import User, Dashboard
+from visual_organizational_structure.forms import ResetPasswordForm, RequestResetForm
 
 from .dash_apps.organization_graph.dashboard import init_dashboard
 
@@ -21,6 +23,7 @@ def home():
         body="This is a homepage served with Flask.",
         base_url=request.base_url,
     )
+
 
 @app.route("/profile")
 def profile():
@@ -49,71 +52,98 @@ def login():
     return render_template('login.jinja2')
 
 
+def check_new_password(password: str, password_retry: str) -> bool:
+    """
+    new password verification
+    :param password: password
+    :param password_retry: password_retry
+    :return: bool permission or prohibition to use this password
+    """
+    if len(password) < 1 and len(password_retry) < 1:
+        flash('Заполните все поля')
+        return False
+    elif len(password) < 7:
+        flash('Пароль должен быть длинее 8 символов')
+        return False
+    elif password != password_retry:
+        flash('Пароли не совпадают')
+        return False
+    else:
+        return True
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     login = request.form.get('login')
+    email = request.form.get('email')
     password = request.form.get('password')
     password2 = request.form.get('password2')
 
     if request.method == 'POST':
-        if not (login and password and password2):
-            flash('Заполните все поля')
-        elif password != password2:
-            flash('Пароли не совпадают')
-        else:
+        if check_new_password(password, password2):
             hash_pwd = generate_password_hash(password)
-            new_user = User(login=login, password=hash_pwd)
-            db.session.add(new_user)
-            db.session.commit()
-
-            return redirect(url_for('login'))
+            new_user = User(login=login, password=hash_pwd, email=email)
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+                return redirect(url_for('login'))
+            except:
+                flash('Ошибка при добавлении пользователя в БД')
+                return redirect(url_for('register'))
 
     return render_template('register.jinja2')
 
 
-@app.route('/logout', methods=['GET', 'POST'])
 @login_required
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
 
-@app.route('/confirm_change_password', methods=['GET', 'POST'])
-def confirm_change_password():
-    old_password = request.form.get('old_password')
-    if old_password:
-        user = User.query.filter_by(login=current_user.login).first()
-        if user and check_password_hash(user.password, old_password):
-            flag = True
-            return change_password(flag)
-        else:
-            flash("Пароль не подходит")
-    else:
-        flash("Заполните все поля!")
-
-    return render_template('confirm_change_password.jinja2')
+@app.route('/reset_password', methods=['GET', 'POST'])
+def request_reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('login'))
+    return render_template('request_reset_password.jinja2', title='Reset Password', form=form)
 
 
-@app.route('/change_password', methods=['GET', 'POST'])
-def change_password(flag=False):
-    if flag:
-        password = request.form.get('password')
-        password2 = request.form.get('password2')
-        user = User.query.filter_by(login=current_user.login).first()
-        if password and password2:
-            if password == password2:
-                user.password = generate_password_hash(password)
-                db.session.commit()
-                logout()
-                return redirect(url_for('login'))
-            else:
-                flash("Пароли не совпадают")
-        else:
-            flash("Заполните все поля!")
+@login_required
+@app.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data)
+        user.password = hashed_password
+        db.session.commit()
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_token.jinja2', title='Reset Password', form=form)
 
-        return render_template('change_password.jinja2')
-    else:
-        flash("Нет доступа!")
+
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('reset_token', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
 
 
 @app.after_request
@@ -169,6 +199,7 @@ def delete_dashboard(dashboard_id):
     flash('Dashboard deleted successfully!')
 
     return redirect(url_for('home'))
+
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
