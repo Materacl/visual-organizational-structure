@@ -25,13 +25,6 @@ def home():
     )
 
 
-@app.route("/profile")
-def profile():
-    return render_template(
-        "profile.jinja2",
-    )
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login = request.form.get('login')
@@ -42,14 +35,14 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(user)
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('home'))
+            next_page = request.args.get("next")
+            return redirect(next_page or url_for("home"))
         else:
-            flash('Логин или пароль некорректны')
+            flash("Логин или пароль некорректны")
     else:
-        flash('Введите логин и пароль')
+        flash("Введите логин и пароль")
 
-    return render_template('login.jinja2')
+    return render_template("login.jinja2")
 
 
 def check_new_password(password: str, password_retry: str) -> bool:
@@ -98,7 +91,7 @@ def register():
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for("home"))
 
 
 @app.route('/reset_password', methods=['GET', 'POST'])
@@ -157,17 +150,15 @@ def redirect_to_signin(response):
 @login_required
 def create_dashboard():
     name = request.form.get('name')
-
     if name:
         new_dashboard = Dashboard(name=name, user_id=current_user.id)
         db.session.add(new_dashboard)
         db.session.commit()
-        flash('Dashboard created successfully!')
 
         # Redirect to the new dashboard's URL
         return redirect(url_for('view_dashboard', dashboard_id=new_dashboard.id))
     else:
-        flash('Name is required for the dashboard')
+        pass
 
     return redirect(url_for('home'))
 
@@ -191,16 +182,16 @@ def delete_dashboard(dashboard_id):
     dashboard = Dashboard.query.get(dashboard_id)
 
     if dashboard.user_id != current_user.id:
-        flash('Unauthorized access')
-        return redirect(url_for('home'))
+        flash("Unauthorized access")
+        return redirect(url_for("home"))
 
     db.session.delete(dashboard)
     db.session.commit()
-    flash('Dashboard deleted successfully!')
+    flash("Dashboard deleted successfully!")
 
-    return redirect(url_for('home'))
+    return redirect(url_for("home"))
 
 
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route("/settings", methods=["GET", "POST"])
 def settings():
-    return render_template('settings.jinja2')
+    return render_template("settings.jinja2")
