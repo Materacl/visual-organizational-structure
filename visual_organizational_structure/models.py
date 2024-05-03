@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer as Serializer
 
 from visual_organizational_structure import db, manager
 from flask import current_app as app
