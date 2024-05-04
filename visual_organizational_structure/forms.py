@@ -7,19 +7,21 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from visual_organizational_structure.models import User
 
 
+
+
 class RequestResetForm(FlaskForm):
     email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+                        validators=[DataRequired(), Email("Некорректная почта")])
     submit = SubmitField('Request Password Reset')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is None:
-            raise ValidationError('There is no account with that email. You must register first.')
+            raise ValidationError('Аккаунта с такой почтой не существует')
 
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Reset Password')
+    submit = SubmitField('Сменить пароль')
