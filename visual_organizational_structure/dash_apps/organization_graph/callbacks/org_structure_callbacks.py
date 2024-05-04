@@ -17,13 +17,10 @@ import dash_bootstrap_components as dbc
 )
 def toggle_modal(confirm_clicks, open_modal_clicks, filename, data):
     if "confirm-csv-uploader" == ctx.triggered_id and filename:
-        print(2)
         return False
     elif "button-1" == ctx.triggered_id:
-        print(3)
         return True
     elif data["state"]:
-        print(1)
         return True
 
 
@@ -52,7 +49,8 @@ def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_
         decoded = base64.b64decode(content_string).decode('utf-8')
 
         try:
-            elements = csv_handling.generate_graph_data_from_csv2(decoded)
+            graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+            elements = graph_tree.get_elements()
             dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
             dashboard.graph_data = json.dumps(elements)
             db.session.commit()

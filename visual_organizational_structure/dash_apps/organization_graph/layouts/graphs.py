@@ -101,7 +101,7 @@ def get_tree_graph(graph_roots=None, graph_elements=None):
         # Layout configuration
         layout={
             'name': 'breadthfirst',  # Use 'breadthfirst' layout algorithm
-            'roots': '[id = "LE0"]',  # Root node
+            'roots': '[id = "MAIN"]',  # Root node
         },
         # Zoom configuration
         minZoom=0.1,
