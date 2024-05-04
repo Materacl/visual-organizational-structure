@@ -6,7 +6,6 @@ import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_
 from dash import html, dcc
 import dash
 import json
-import visual_organizational_structure.dash_apps.organization_graph.callbacks.org_structure_callbacks
 
 # Register the Dash app page
 dash.register_page(
