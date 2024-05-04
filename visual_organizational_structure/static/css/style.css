@@ -525,6 +525,7 @@ article>span:hover {
   font-family: 'Rubik', sans-serif;
 }
 
+/*animation
 .animation {
   animation-name: move;
   animation-duration: .4s;
@@ -583,6 +584,8 @@ article>span:hover {
   }
 }
 
+*/
+
 /*alerts style*/
 
 .alert {
@@ -635,3 +638,26 @@ article>span:hover {
   border: 1px solid #EDD;
   color: #A66;
 }
+
+
+
+
+/*change password*/
+
+.login-change{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  list-style-type: none;
+  font-family: 'Rubik';
+  font-size: 16px;
+  margin-bottom: -10px;
+}
+
+.text-black{
+  color: black;
+}
+
+
+
+
