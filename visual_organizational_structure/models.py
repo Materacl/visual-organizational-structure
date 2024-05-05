@@ -7,7 +7,7 @@ from flask import current_app as app
 
 
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     login = db.Column(db.String(127), unique=True, nullable=False)
     email = db.Column(db.String(127), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
@@ -40,9 +40,10 @@ class User(db.Model, UserMixin):
 
 
 class Dashboard(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(150), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    graph_data = db.Column(db.Text, nullable=True)
 
 
 @manager.user_loader

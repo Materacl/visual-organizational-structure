@@ -25,16 +25,23 @@
         <div class="container">
             <div class="left">
                 <div class="header">
-                    <h2 class="animation a1">Добро пожаловать</h2>
-                    <h4 class="animation a2">Зарегистрируйтесь, используя логин и пароль</h4>
+                    <h2>Добро пожаловать</h2>
+                    <h4>Зарегистрируйтесь, используя почту, логин и пароль</h4>
                 </div>
                 <div class="form">
-                    <input type="email" name='email'>
-                    <input type="login" name='login' class="form-field animation a3" placeholder="login">
-                    <input type="password" name='password' class="form-field animation a4" placeholder="password">
-                    <input type="password" name='password2' class="form-field animation a4" placeholder="password">
-                    <p class="animation a5"><a href="#">Забыл пароль</a></p>
-                    <button class="animation a6" type="submit" value="login">Регистрация</button>
+                    <input type="email" name='email' class="form-field" placeholder="Почта">
+                    <input type="login" name='login' class="form-field" placeholder="Логин">
+                    <input type="password" name='password' class="form-field" placeholder="Пароль">
+                    <input type="password" name='password2' class="form-field" placeholder="Пароль">
+                    <nav>
+                        <ul class = 'login-change'>
+                            <li><a href="/login" class = "text-black">Зарегестрирован</a></li>
+                            <li><a href="#" class = "text-black">Забыл пароль</a></p></li>
+                        </ul>
+
+                    </nav>
+
+                    <button type="submit" value="login">Регистрация</button>
                 </div>
             </div>
             <div class="right"></div>

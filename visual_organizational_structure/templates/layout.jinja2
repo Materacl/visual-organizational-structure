@@ -27,26 +27,62 @@
         </div>
         <div class="user-info">
             {% if current_user.is_authenticated %}
-            <ul class = "menu">
-                <li ><div class="user-actions">
-                    <a href="/logout" class="logout-button">Выйти</a></li>
-                    <div class="register">
-                        <a href="/profile"><img src="{{ url_for('static', filename='images/login.svg') }}"
-                                alt="register-img" class="register-photo" /></a>               
+            <ul class="">
+                <li class="menu">
+                    <div class="user-actions">
+                        <a href="/logout" class="logout-button">Выйти</a>
+                </li>
+                <div class="register">
+                    {% if current_user.is_authenticated %}
+                    <div class="select-menu active">
+                        <div class="select-btn">
+                            <span class="sBtn-text"><svg width="200" height="200" viewBox="0 0 200 200" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" class="register-photo">
+                                    <circle cx="100" cy="100" r="100" fill="black" />
+                                    <circle cx="100" cy="100" r="95" fill="white" />
+                                    <path
+                                        d="M91.102 98.5564C96.3933 94.6575 103.607 94.6575 108.898 98.5564L158.254 134.924C169.911 143.513 163.836 162 149.356 162H50.6438C36.1641 162 30.0888 143.513 41.7458 134.924L91.102 98.5564Z"
+                                        fill="black" />
+                                    <circle cx="100" cy="67" r="25" fill="black" />
+                                </svg>
+                            </span>
+                            <i class="bx bx-chevron-down"></i>
+                        </div>
+                        <ul class="options">
+                            <li class="option">
+                                <span class="option-text">Login: {{current_user.login}}</span>
+                            </li>
+                            <li class="option">
+                                <span class="option-text">Email: example@pochta.ru</span>
+                            </li>
+                            <li class="option">
+                                <span class="option-text">Отделение: Венеция</span>
+                            </li>
+                        </ul>
                     </div>
+
+
+                    <!-- <div class="register-photo dropbtn" onclick="myFunction()" style="background-image: url({{ url_for('static', filename='images/login.svg') }});"></div>-->
+                    {%else%}
+                    <a href="/profile"><img src="{{ url_for('static', filename='images/login.svg') }}"
+                            alt="register-img" class="register-photo" /></a>
+                    {%endif%}
                 </div>
-            </ul>
-            {% else %}
-            <ul class = "menu">
-                <li ><div class="user-actions">
-                    <a href="/register" class="logout-button">Войти</a></li>
-                    <div class="register">
-                        <a href="/register"><img src="{{ url_for('static', filename='images/login.svg') }}"
-                                alt="register-img" class="register-photo" /></a>               
-                    </div>
-                </div>
-            </ul>
-            {% endif %}
+        </div>
+        </ul>
+        {% else %}
+        <ul class="menu">
+            <li>
+                <div class="user-actions">
+                    <a href="/register" class="logout-button">Войти</a>
+            </li>
+            <div class="register">
+                <a href="/register"><img src="{{ url_for('static', filename='images/login.svg') }}" alt="register-img"
+                        class="register-photo" /></a>
+            </div>
+            </div>
+        </ul>
+        {% endif %}
         </div>
     </header>
 
@@ -79,8 +115,7 @@
             </div>
         </div>
     </footer>
-
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 
 </html>
