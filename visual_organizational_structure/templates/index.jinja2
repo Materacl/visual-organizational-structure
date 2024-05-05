@@ -12,8 +12,8 @@
                     <figure>
                         <img src="#" alt="" class="dash">
                         <p class="dash-text">{{ dashboard.name }}</p>
-                        <form action="/delete_dashboard/{{ dashboard.id }}" method="post">
-                            <button type="submit">Delete {{ dashboard.name }}</button>
+                        <form action="/delete_dashboard/{{ dashboard.id }}" method="post" class="btn-dash-low">
+                            <button type="submit" class="btn-dash"><span>Удалить доску</span></button>
                         </form>
                     </figure>
                 </a>
@@ -30,18 +30,22 @@
                         <p class="dash-create-text" id="create-dashboard-text">Создать доску</p>
                     </figure>
                 </a>
-                <form class="create-dashboard-form" id="create-dashboard-form" action="/create_dashboard" method="post"
-                    style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                    <input type="text" name="name" placeholder="Dashboard name">
-                    <input type="submit" value="Create Dashboard">
-                </form>
+                <form class="" id="create-dashboard-form" action="/create_dashboard" method="post"
+                    style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                    <div class="form">
+                            <input type="text" name="name" class="form-field" placeholder="Имя доски">
+                            <button type="submit" value="Создать" class ='btn-form-dash'>Создать</button>
+                    </div>
             </div>
-        </span>
-    </article>
+            </form>
 
-    {% else %}
-    <p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
-    {% endif %}
+</div>
+</span>
+</article>
+
+{% else %}
+<p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
+{% endif %}
 </div>
 
 <script>

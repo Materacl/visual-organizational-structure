@@ -415,9 +415,14 @@ article>span:hover {
 }
 
 .dash-text {
-  color: white;
-  font-size: 60px;
+  color: rgb(255, 255, 255);
+  font-size: 58px;
   margin: auto;
+  margin-left: 5px;
+  font-style: 'Rubick'; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dash-create-text {
@@ -425,6 +430,11 @@ article>span:hover {
   font-size: 24px;
   text-decoration: none;
 }
+
+.create-dashboard-form{
+  
+}
+
 
 .create-dashboard-form {
   z-index: 1000;
@@ -434,10 +444,83 @@ article>span:hover {
   padding: 20px;
   /* Add padding */
   border-radius: 8px;
+  border-width: 10px;
+  border-color: #000;
+  margin: 10px;
   /* Add rounded corners */
+  width: 15%;
+  height: 10%;
 }
 
+.confirm-modal {
+  z-index: 1000;
+  display: block;
+  pointer-events: none;
+  transition: opacity 0.5s;
+  .btn {
+    width: auto;
+    max-width: auto;
+    margin: auto;
+  }
+}
 
+.wrapper{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btn-dash{
+  display: block;
+  width: 140px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  font-family: 'Rubick';
+  text-decoration: none;
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px inset #000000;
+  letter-spacing: 2px;
+  text-align: center;
+  position: relative;
+  transition: all .35s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 8px;
+  border-width: 2px;
+  border-color: white;
+}
+
+.btn-dash span{
+  position: relative;
+  z-index: 2;
+}
+
+.btn-dash:after{
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: #ce224a;
+  transition: all .35s;
+}
+
+.btn-dash:hover{
+  color: #fff;
+}
+
+.btn-dash:hover:after{
+  width: 100%;
+}
+
+.btn-form-dash{
+  background-color: white;
+}
 
 
 /* login-register*/
@@ -523,7 +606,18 @@ article>span:hover {
   color: #fff;
   letter-spacing: 1px;
   font-family: 'Rubik', sans-serif;
+  transition: 1s;
 }
+
+
+
+ 
+.form>button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #de48b5 25%, #0097ff 100%);
+  
+}
+
 
 /*animation
 .animation {
