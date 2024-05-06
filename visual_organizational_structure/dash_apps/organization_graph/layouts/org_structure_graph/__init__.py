@@ -3,37 +3,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, callback, Input, Output
 from dash.exceptions import PreventUpdate
 
-stylesheet1 = [
-    {
-        'selector': 'node',  # Style for nodes
-        'style': {
-            'label': 'data(label)',  # Updated to use 'label' from node data
-            'text-valign': 'center',  # Center the text vertically
-            'text-halign': 'center',  # Align the text to the center
-            'text-margin-y': '0px',  # Adjust vertical text margin
-            'text-margin-x': '0px',  # Adjust horizontal text margin
-            'background-color': '#1f77b4',  # Change node color to a blue shade
-            'color': 'white',  # Change text color to white
-            'shape': 'roundrectangle',  # Use roundrectangle shape for nodes
-            'width': 'label',  # Set node width based on label size
-            'height': 'label',  # Set node height based on label size
-            'font-size': '16px',  # Adjust font size
-            'padding': '10px',  # Add padding to node
-            'text-wrap': 'wrap'  # Allow text to wrap within node
-        }
-    },
-    {
-        'selector': 'edge',  # Style for edges
-        'style': {
-            'width': 3,
-            'line-color': '#ccc',
-            'target-arrow-color': '#ccc',
-            'target-arrow-shape': 'triangle'
-        }
-    }
-]
-
-stylesheet2 = [
+stylesheet = [
     {
         'selector': 'node',  # Style for nodes
         'style': {
@@ -122,7 +92,7 @@ def get_tree_graph(graph_roots=None, graph_elements=None):
         # Graph elements
         elements=graph_elements,
         # Stylesheet configuration
-        stylesheet=stylesheet2
+        stylesheet=stylesheet
     )
 
 
@@ -136,16 +106,6 @@ node_info_collapse = dbc.Collapse(
     id='node-info-collapse',
     is_open=False,
     style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
-)
-
-layout_choose = dcc.Dropdown(
-    id='dropdown-update-layout',
-    value='breadthfirst',
-    clearable=False,
-    options=[
-        {'label': name.capitalize(), 'value': name}
-        for name in ['breadthfirst', 'random']
-    ]
 )
 
 

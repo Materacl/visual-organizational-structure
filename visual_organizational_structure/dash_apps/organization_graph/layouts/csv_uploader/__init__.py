@@ -12,6 +12,7 @@ from visual_organizational_structure import db
 
 
 def csv_uploader(state: bool = False) -> dbc.Modal:
+    print(state)
     return dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("Загрузка CSV файла"), close_button=True),
@@ -53,19 +54,22 @@ def csv_uploader(state: bool = False) -> dbc.Modal:
 
 
 @callback(
-    Output("uploader-csv", "is_open"),
+    [Output("uploader-csv", "is_open"),
+     Output("dashboard-data", 'data')],
     [Input("confirm-csv-uploader", "n_clicks"),
-     Input("button-1", "n_clicks"),
+     Input("upload_csv_btn", "n_clicks"),
      Input("upload-data", "filename"),
      Input("dashboard-data", 'data')],
 )
-def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename, data):
+def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashboard_data: dict):
     if "confirm-csv-uploader" == ctx.triggered_id and filename:
-        return False
-    elif "button-1" == ctx.triggered_id:
-        return True
-    elif data["state"]:
-        return True
+        dashboard_data['state'] = False
+        return False, dashboard_data
+    elif "upload_csv_btn" == ctx.triggered_id or dashboard_data["state"]:
+        dashboard_data['state'] = True
+        return True, dashboard_data
+    else:
+        return dashboard_data['state'], dashboard_data
 
 
 @callback(
@@ -77,8 +81,7 @@ def update_scv_file_name(filename):
 
 
 @callback(
-    [Output('cytoscape-org-graph', 'elements'),
-     Output("dashboard-data", 'data')],
+    Output('cytoscape-org-graph', 'elements'),
     [Input('upload-data', 'contents'),
      Input('cytoscape-org-graph', 'elements'),
      Input('confirm-csv-uploader', 'n_clicks'),
@@ -98,9 +101,9 @@ def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_
             dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
             dashboard.graph_data = json.dumps(elements)
             db.session.commit()
-            return elements, {"state": False, "dashboard_id": dashboard_data["dashboard_id"]}
+            return elements
         except Exception as e:
             print(e)
             return dbc.Alert("There was an error processing the file.", color="danger")
     else:
-        return current_contents, {"state": True, "dashboard_id": dashboard_data["dashboard_id"]}
+        return current_contents
