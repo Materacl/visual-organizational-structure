@@ -1,7 +1,10 @@
+import json
+
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
-from dash import dcc, html, callback, Input, Output
+from dash import dcc, html, callback, Input, Output, ctx
 from dash.exceptions import PreventUpdate
+from visual_organizational_structure.models import Dashboard
 
 stylesheet = [
     {
@@ -110,15 +113,20 @@ node_info_collapse = dbc.Collapse(
 
 
 @callback(
-    Output('cytoscape-org-graph', 'layout'),
-    Input('dropdown-update-layout', 'value')
+    Output('cytoscape-org-graph', 'elements'),
+    [Input("dashboard-data", 'data'),
+     Input('confirm-csv-uploader', 'n_clicks')]
 )
-def update_layout(layout):
-    return {
-        'name': layout,
-        'animate': True,
-        'roots': '[id = "LE0"]'
-    }
+def update_graph(dashboard_data, confirm_clicks):
+    if "confirm-csv-uploader" == ctx.triggered_id:
+        dashboard = Dashboard.query.get(dashboard_data['dashboard_id'])
+        graph_elements = json.loads(dashboard.graph_data)
+        if graph_elements is None:
+            raise PreventUpdate
+        elif len(graph_elements) > 100:
+            return []
+        else:
+            return graph_elements
 
 
 @callback(

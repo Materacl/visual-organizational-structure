@@ -5,7 +5,6 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html, Input, Output, callback, ctx
 from dash.exceptions import PreventUpdate
-import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_filter as graph_filter
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from visual_organizational_structure.models import Dashboard
 from visual_organizational_structure import db
@@ -19,8 +18,7 @@ def csv_uploader(state: bool = False) -> dbc.Modal:
                 dcc.Upload(
                     id='uploader-element',
                     children=html.Div([
-                        'Перетащите или ',
-                        html.A('Выберите Файл')
+                        'Перетащите или Выберите Файл'
                     ]),
                     style={
                         'width': '100%',
@@ -97,7 +95,7 @@ def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashbo
 
 
 @callback(
-    Output('cytoscape-org-graph', 'elements'),
+    Output('graph-filter-window', 'is_open'),
     [Input('uploader-element', 'contents'),
      Input('cytoscape-org-graph', 'elements'),
      Input('confirm-csv-uploader', 'n_clicks'),
@@ -117,9 +115,12 @@ def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_
             dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
             dashboard.graph_data = json.dumps(elements)
             db.session.commit()
-            return elements
+            if len(elements) > 100:
+                return True
+            else:
+                return False
         except Exception as e:
             print(e)
             return dbc.Alert("There was an error processing the file.", color="danger")
     else:
-        return current_contents
+        return False

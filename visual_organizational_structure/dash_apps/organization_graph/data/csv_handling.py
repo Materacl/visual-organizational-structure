@@ -69,7 +69,7 @@ class CSVHandler(Tree):
             Returns:
                 None
             """
-            element_path = tuple(full_path[0:element_num])
+            element_path = tuple([path for path in full_path[0:element_num] if path])
             if element_path not in paths:
                 element_id = f"{id_str.upper()}{ids[id_str]}"
                 paths[element_path] = element_id

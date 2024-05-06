@@ -3,6 +3,7 @@ from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph as org_structure_graph
 import visual_organizational_structure.dash_apps.organization_graph.layouts.menu_buttons as menu_buttons
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
+import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_filter as graph_filter
 from dash import html, dcc
 import dash
 import json
@@ -31,9 +32,11 @@ def layout(dashboard_id=None):
 
     return html.Div(
         [
-            dcc.Store(id="dashboard-data", data={"state": state, "dashboard_id": dashboard_id}),
+            dcc.Store(id="dashboard-data",
+                      data={"state": state, "dashboard_id": dashboard_id}),
             org_structure_graph.get_tree_graph([], graph_elements),
             csv_uploader.csv_uploader(state),
+            graph_filter.filter_chooser(),
             menu_buttons.dashboard_menu_buttons,
             org_structure_graph.node_info_collapse
         ]
