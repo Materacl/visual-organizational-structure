@@ -121,7 +121,7 @@ def reset_token(token):
         hashed_password = generate_password_hash(form.password.data)
         user.password = hashed_password
         db.session.commit()
-        flash('Your password has been updated! You are now able to log in', 'success')
+        flash('Ваш пароль был успешно изменен!', 'success')
         return redirect(url_for('login'))
     return render_template('reset_token.jinja2', title='Reset Password', form=form)
 
