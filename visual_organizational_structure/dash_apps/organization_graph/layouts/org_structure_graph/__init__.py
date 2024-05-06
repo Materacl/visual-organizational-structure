@@ -2,9 +2,11 @@ import json
 
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
-from dash import dcc, html, callback, Input, Output, ctx
+from dash import dcc, html, callback, Input, Output, ctx, State
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
+from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
+from visual_organizational_structure import db
 
 stylesheet = [
     {
@@ -25,41 +27,10 @@ stylesheet = [
             'text-wrap': 'wrap'  # Allow text to wrap within node
         }
     },
-    {
-        'selector': '.nonterminal',
-        'style': {
-            'label': 'data(confidence)',
-            'background-opacity': 0,
-            "text-halign": "left",
-            "text-valign": "top",
-        }
-    },
-    {
-        'selector': '.support',
-        'style': {'background-opacity': 0}
-    },
-    {
-        'selector': 'edge',
-        'style': {
-            "source-endpoint": "inside-to-node",
-            "target-endpoint": "inside-to-node",
-        }
-    },
-    {
-        'selector': '.terminal',
-        'style': {
-            'label': 'data(name)',
-            'width': 10,
-            'height': 10,
-            "text-valign": "center",
-            "text-halign": "right",
-            'background-color': '#222222'
-        }
-    }
 ]
 
 
-def get_tree_graph(graph_roots=None, graph_elements=None):
+def get_tree_graph(graph_elements=None, roots=None):
     """
     Create and return a Cytoscape tree graph with specified layout and style.
 
@@ -69,32 +40,24 @@ def get_tree_graph(graph_roots=None, graph_elements=None):
     Returns:
     - dash_cytoscape.Cytoscape: Cytoscape tree graph object.
     """
-    # Define the Cytoscape graph
     return cyto.Cytoscape(
         id='cytoscape-org-graph',
-        # Layout configuration
         layout={
-            'name': 'breadthfirst',  # Use 'breadthfirst' layout algorithm
-            'roots': '[id = "MAIN"]',  # Root node
+            'name': 'breadthfirst',
+            'roots': roots,
         },
-        # Zoom configuration
         minZoom=0.1,
         maxZoom=5,
-        # Enable box selection
         boxSelectionEnabled=True,
-        # Make the graph responsive
         responsive=True,
-        # Style configuration
         style={
-            'width': '100%',  # Set width to 100%
-            'height': '100vh',  # Set height to 100% of viewport height
-            'position': 'fixed',  # Fixed position
-            'top': 0,  # Top position
-            'left': 0  # Left position
+            'width': '100%',
+            'height': '100vh',
+            'position': 'fixed',
+            'top': 0,
+            'left': 0
         },
-        # Graph elements
         elements=graph_elements,
-        # Stylesheet configuration
         stylesheet=stylesheet
     )
 
@@ -113,36 +76,40 @@ node_info_collapse = dbc.Collapse(
 
 
 @callback(
-    Output('cytoscape-org-graph', 'elements'),
+    [Output('cytoscape-org-graph', 'elements'),
+     Output('cytoscape-org-graph', 'layout')],
     [Input("dashboard-data", 'data'),
-     Input('confirm-csv-uploader', 'n_clicks')]
+     Input('confirm-csv-uploader', 'n_clicks'),
+     Input('confirm-filter', 'n_clicks'),
+     Input('filter-dropdown', 'value')],
+    [State('cytoscape-org-graph', 'elements'),
+     State('cytoscape-org-graph', 'layout')]
 )
-def update_graph(dashboard_data, confirm_clicks):
+def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, current_elements, current_layout):
     if "confirm-csv-uploader" == ctx.triggered_id:
         dashboard = Dashboard.query.get(dashboard_data['dashboard_id'])
-        graph_elements = json.loads(dashboard.graph_data)
-        if graph_elements is None:
-            raise PreventUpdate
-        elif len(graph_elements) > 100:
-            return []
+        if dashboard.graph_data:
+            graph_elements = json.loads(dashboard.graph_data)
+            if graph_elements is None:
+                raise PreventUpdate
+            elif len(graph_elements) > 100:
+                current_layout['roots'] = '[id = "MAIN"]'
+                return [], current_layout
+            else:
+                current_layout['roots'] = '[id = "MAIN"]'
+                return graph_elements, current_layout
         else:
-            return graph_elements
-
-
-@callback(
-    Output('node-info-content', 'children'),
-    Input('cytoscape-org-graph', 'tapNodeData'),
-)
-def display_node_info(node_data):
-    if node_data is None:
+            raise PreventUpdate
+    elif 'confirm-filter' == ctx.triggered_id:
+        dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+        decoded = dashboard.raw_data
+        graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+        graph_elements = graph_tree.find_by_id(filter_value, method='bfs').get_elements()
+        dashboard.graph_data = json.dumps(graph_elements)
+        roots = f'[id = "{filter_value}"]'
+        dashboard.graph_roots = roots
+        db.session.commit()
+        current_layout['roots'] = roots
+        return graph_elements, current_layout
+    else:
         raise PreventUpdate
-
-    # Create a table to display the node's attributes
-    node_info_table = html.Table(
-        [
-            html.Tr([html.Td("Node ID"), html.Td(node_data['id'])]),
-            # Add more rows as needed for other node attributes
-        ]
-    )
-
-    return node_info_table

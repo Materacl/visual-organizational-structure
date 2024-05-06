@@ -31,6 +31,9 @@ class Dashboard(db.Model):
     name = db.Column(db.String(150), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     graph_data = db.Column(db.Text, nullable=True)
+    raw_data = db.Column(db.Text, nullable=True)
+    graph_no_filter_data = db.Column(db.Text, nullable=True)
+    graph_roots = db.Column(db.Text, nullable=True)
 
 
 @manager.user_loader

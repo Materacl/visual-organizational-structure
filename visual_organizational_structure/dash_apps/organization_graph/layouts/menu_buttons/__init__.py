@@ -2,8 +2,8 @@ import dash_bootstrap_components as dbc
 
 dashboard_menu_buttons = dbc.ButtonGroup(
     [
-        dbc.Button('Загрузить CSV', id='upload_csv_btn', n_clicks=0),
-        dbc.Button('Фильтр', id='filter_csv_btn', n_clicks=0)
+        dbc.Button('Загрузить CSV', id='upload-csv-btn', n_clicks=0),
+        dbc.Button('Фильтр', id='filter-csv-btn', n_clicks=0)
     ],
     style={
         'position': 'absolute',

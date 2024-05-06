@@ -79,7 +79,7 @@ def update_scv_file_name(filename):
     [Output("uploader-csv", "is_open"),
      Output("dashboard-data", 'data')],
     [Input("confirm-csv-uploader", "n_clicks"),
-     Input("upload_csv_btn", "n_clicks"),
+     Input("upload-csv-btn", "n_clicks"),
      Input("uploader-element", "filename"),
      Input("dashboard-data", 'data')],
 )
@@ -87,7 +87,7 @@ def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashbo
     if "confirm-csv-uploader" == ctx.triggered_id and filename:
         dashboard_data['state'] = False
         return False, dashboard_data
-    elif "upload_csv_btn" == ctx.triggered_id or dashboard_data["state"]:
+    elif "upload-csv-btn" == ctx.triggered_id or dashboard_data["state"]:
         dashboard_data['state'] = True
         return True, dashboard_data
     else:
@@ -97,11 +97,11 @@ def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashbo
 @callback(
     Output('graph-filter-window', 'is_open'),
     [Input('uploader-element', 'contents'),
-     Input('cytoscape-org-graph', 'elements'),
      Input('confirm-csv-uploader', 'n_clicks'),
+     Input('filter-csv-btn', 'n_clicks'),
      Input("dashboard-data", 'data')],
 )
-def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_data):
+def update_graph_from_csv(contents, confirm_clicks, filter_clicks, dashboard_data):
     if "confirm-csv-uploader" == ctx.triggered_id:
         if contents is None:
             raise PreventUpdate
@@ -114,6 +114,8 @@ def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_
             elements = graph_tree.get_elements()
             dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
             dashboard.graph_data = json.dumps(elements)
+            dashboard.graph_no_filter_data = json.dumps(elements)
+            dashboard.raw_data = decoded
             db.session.commit()
             if len(elements) > 100:
                 return True
@@ -122,5 +124,7 @@ def update_graph_from_csv(contents, current_contents, confirm_clicks, dashboard_
         except Exception as e:
             print(e)
             return dbc.Alert("There was an error processing the file.", color="danger")
+    elif 'filter-csv-btn' == ctx.triggered_id:
+        return True
     else:
         return False
