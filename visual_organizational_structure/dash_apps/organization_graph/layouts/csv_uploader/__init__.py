@@ -12,13 +12,12 @@ from visual_organizational_structure import db
 
 
 def csv_uploader(state: bool = False) -> dbc.Modal:
-    print(state)
     return dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("Загрузка CSV файла"), close_button=True),
             dbc.ModalBody([
                 dcc.Upload(
-                    id='upload-data',
+                    id='uploader-element',
                     children=html.Div([
                         'Перетащите или ',
                         html.A('Выберите Файл')
@@ -33,10 +32,23 @@ def csv_uploader(state: bool = False) -> dbc.Modal:
                         'textAlign': 'center',
                         'marginBottom': '15px',
                     },
-                    multiple=False
+                    multiple=False,
+                    accept='.csv'
                 ),
-                html.Div(id='filename-display', children=''),
-                graph_filter.filter_chooser()
+                dbc.Collapse(
+                    [
+                        dbc.Card(
+                            [
+                                html.I(id='filename-display-icon', className='bi bi-filetype-csv',
+                                       style={'fontSize': '60px'}),
+                                html.Div(id='filename-display-text', children='')
+                            ],
+                            style={'width': '25%', 'text-align': 'center', 'margin-bottom': '15px'}
+                        ),
+                    ],
+                    id="filename-display",
+                    is_open=False,
+                ),
             ]),
             dbc.ModalFooter(
                 dbc.Button(
@@ -54,11 +66,23 @@ def csv_uploader(state: bool = False) -> dbc.Modal:
 
 
 @callback(
+    [Output('filename-display-text', 'children'),
+     Output('filename-display', 'is_open')],
+    Input("uploader-element", "filename"),
+)
+def update_scv_file_name(filename):
+    if filename:
+        return filename, True
+    else:
+        return filename, False
+
+
+@callback(
     [Output("uploader-csv", "is_open"),
      Output("dashboard-data", 'data')],
     [Input("confirm-csv-uploader", "n_clicks"),
      Input("upload_csv_btn", "n_clicks"),
-     Input("upload-data", "filename"),
+     Input("uploader-element", "filename"),
      Input("dashboard-data", 'data')],
 )
 def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashboard_data: dict):
@@ -73,16 +97,8 @@ def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashbo
 
 
 @callback(
-    Output('filename-display', 'children'),
-    Input("upload-data", "filename"),
-)
-def update_scv_file_name(filename):
-    return filename
-
-
-@callback(
     Output('cytoscape-org-graph', 'elements'),
-    [Input('upload-data', 'contents'),
+    [Input('uploader-element', 'contents'),
      Input('cytoscape-org-graph', 'elements'),
      Input('confirm-csv-uploader', 'n_clicks'),
      Input("dashboard-data", 'data')],
