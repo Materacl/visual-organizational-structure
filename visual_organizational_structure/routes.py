@@ -7,7 +7,7 @@ from flask_mail import Message
 
 from visual_organizational_structure import db, mail
 from visual_organizational_structure.models import User, Dashboard
-from visual_organizational_structure.forms import ResetPasswordForm, RequestResetForm
+from visual_organizational_structure.forms import ResetPasswordForm, RequestResetForm, RegisterForm, LoginForm
 
 from .dash_apps.organization_graph.dashboard import init_dashboard
 
@@ -27,64 +27,34 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    login = request.form.get('login')
-    password = request.form.get('password')
 
-    if login and password:
-        user = User.query.filter_by(login=login).first()
-
-        if user and check_password_hash(user.password, password):
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page or url_for("home"))
-        else:
-            flash("Логин или пароль некорректны")
     else:
-        flash("Введите логин и пароль")
-
-    return render_template("login.jinja2")
-
-
-def check_new_password(password: str, password_retry: str) -> bool:
-    """
-    new password verification
-    :param password: password
-    :param password_retry: password_retry
-    :return: bool permission or prohibition to use this password
-    """
-    if len(password) < 1 and len(password_retry) < 1:
-        flash('Заполните все поля')
-        return False
-    elif len(password) < 7:
-        flash('Пароль должен быть длинее 8 символов')
-        return False
-    elif password != password_retry:
-        flash('Пароли не совпадают')
-        return False
-    else:
-        return True
+        flash('проблема с валидацией')
+    return render_template("login.jinja2", title='Login', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    login = request.form.get('login')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    password2 = request.form.get('password2')
 
-    if request.method == 'POST':
-        if check_new_password(password, password2):
-            hash_pwd = generate_password_hash(password)
-            new_user = User(login=login, password=hash_pwd, email=email)
-            try:
-                db.session.add(new_user)
-                db.session.commit()
-                return redirect(url_for('login'))
-            except:
-                flash('Ошибка при добавлении пользователя в БД')
-                return redirect(url_for('register'))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        hash_password = generate_password_hash(form.password.data)
+        new_user = User(password=hash_password, email=form.email.data)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        except:
+            return redirect(url_for('register'))
 
-    return render_template('register.jinja2')
+    return render_template('register.jinja2', title='Register', form=form)
 
 
 @login_required
