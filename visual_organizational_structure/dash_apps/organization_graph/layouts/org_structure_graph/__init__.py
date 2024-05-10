@@ -77,7 +77,8 @@ node_info_collapse = dbc.Collapse(
 
 @callback(
     [Output('cytoscape-org-graph', 'elements'),
-     Output('cytoscape-org-graph', 'layout')],
+     Output('cytoscape-org-graph', 'layout'),
+     Output('filter-info-text', 'children')],
     [Input("dashboard-data", 'data'),
      Input('confirm-csv-uploader', 'n_clicks'),
      Input('confirm-filter', 'n_clicks'),
@@ -94,10 +95,10 @@ def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, cu
                 raise PreventUpdate
             elif len(graph_elements) > 100:
                 current_layout['roots'] = '[id = "MAIN"]'
-                return [], current_layout
+                return [], current_layout, ''
             else:
                 current_layout['roots'] = '[id = "MAIN"]'
-                return graph_elements, current_layout
+                return graph_elements, current_layout, ''
         else:
             raise PreventUpdate
     elif 'confirm-filter' == ctx.triggered_id:
@@ -105,11 +106,14 @@ def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, cu
         decoded = dashboard.raw_data
         graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
         graph_elements = graph_tree.find_by_id(filter_value, method='bfs').get_elements()
-        dashboard.graph_data = json.dumps(graph_elements)
-        roots = f'[id = "{filter_value}"]'
-        dashboard.graph_roots = roots
-        db.session.commit()
-        current_layout['roots'] = roots
-        return graph_elements, current_layout
+        if len(graph_elements) > 100:
+            return current_elements, current_layout, 'Слишком большой граф, выберите другой элемент!'
+        else:
+            dashboard.graph_data = json.dumps(graph_elements)
+            roots = f'[id = "{filter_value}"]'
+            dashboard.graph_roots = roots
+            db.session.commit()
+            current_layout['roots'] = roots
+            return graph_elements, current_layout, ''
     else:
         raise PreventUpdate

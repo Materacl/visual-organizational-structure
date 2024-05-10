@@ -75,7 +75,7 @@ class CSVHandler(Tree):
                 paths[element_path] = element_id
                 ids[id_str] += 1
 
-                parent_path = find_parent_path(element_path)
+                parent_path = tuple(filter(lambda x: x != "", full_path[:element_num-1]))
                 parent_id = paths[parent_path]
                 parent_node = self.find_by_id(parent_id)
                 parent_node.children.append(Tree(element_id, data={'label': element_path[-1]}))
@@ -91,7 +91,7 @@ class CSVHandler(Tree):
             Returns:
                 None
             """
-            parent_path = find_parent_path(tuple(full_path))
+            parent_path = tuple(filter(lambda x: x != "", full_path))
             parent_id = paths[parent_path]
             parent_node = self.find_by_id(parent_id)
             parent_node.children.append(Tree(employee_data[0], data={
@@ -120,7 +120,7 @@ class CSVHandler(Tree):
             create_children_employee(path, data)
 
 
-def find_parent_path(element_path: tuple) -> tuple:
+def find_parent_path(element_path: list) -> tuple:
     """
     Find the parent path of an element path.
 

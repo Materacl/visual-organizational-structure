@@ -13,12 +13,13 @@ def filter_chooser(state: bool = False) -> dbc.Modal:
             dbc.ModalHeader(dbc.ModalTitle("Фильтрация графа"), close_button=True),
             dbc.ModalBody(
                 [
-                    dbc.Label("Dropdown", html_for="dropdown"),
+                    dbc.Label("Выберите организационную единицу", html_for="dropdown"),
                     dbc.Form(
                         dcc.Dropdown(
                             id="filter-dropdown",
                         ),
                     ),
+                    html.Div(id='filter-info-text', children='', style={'color': 'red'}),
                 ]
             ),
             dbc.ModalFooter(
@@ -51,7 +52,6 @@ def get_filter_options(filter_clicks, current_options, filter_window_is_open, da
         for v, element in enumerate(graph_elements):
             if 'label' in element['data']:
                 options.append({'label': element['data']['label'], 'value': element['data']['id']})
-        print(options)
         return options
     else:
         raise PreventUpdate
