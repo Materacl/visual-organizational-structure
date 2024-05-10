@@ -110,7 +110,7 @@ def get_data_from_scv(contents, dashboard_data):
         dashboard.raw_data = decoded
         dashboard.graph_roots = '[id = "MAIN"]'
         db.session.commit()
-        return elements
+        return elements, graph_tree
     except Exception as e:
         print(e)
         return dbc.Alert("There was an error processing the file.", color="danger")

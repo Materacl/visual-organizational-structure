@@ -18,6 +18,7 @@ dash.register_page(
 
 
 def layout(dashboard_id=None):
+    global graph_tree
     dashboard = Dashboard.query.get(dashboard_id)
 
     if not dashboard or dashboard.user_id != current_user.id:
