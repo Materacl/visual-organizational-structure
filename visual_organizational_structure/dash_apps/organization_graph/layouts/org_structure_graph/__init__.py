@@ -74,8 +74,6 @@ node_info_collapse = dbc.Collapse(
 )
 
 last_node_timestamp = ''
-
-
 @callback(
     [Output('cytoscape-org-graph', 'elements'),
      Output('cytoscape-org-graph', 'layout'),
@@ -89,8 +87,7 @@ last_node_timestamp = ''
     [State('cytoscape-org-graph', 'elements'),
      State('cytoscape-org-graph', 'layout')]
 )
-def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_clicks, filter_value, tap_node_data,
-                 current_elements,
+def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_clicks, filter_value, tap_node_data, current_elements,
                  current_layout):
     global last_node_timestamp
 
@@ -114,8 +111,8 @@ def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_click
             db.session.commit()
             current_layout['roots'] = roots
             return graph_elements, current_layout, ''
-    elif tap_node_data and last_node_timestamp != tap_node_data.get('timestamp', None):
-        last_node_timestamp = tap_node_data.get('timestamp', None)
+    elif tap_node_data and last_node_timestamp != tap_node_data.get('timeStamp', None):
+        last_node_timestamp = tap_node_data.get('timeStamp', None)
         dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
         decoded = dashboard.raw_data
         graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
@@ -138,4 +135,3 @@ def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_click
             return current_elements + graph_elements, current_layout, ''
     else:
         raise PreventUpdate
-
