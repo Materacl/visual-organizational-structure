@@ -752,15 +752,16 @@ article>span:hover {
 .login-change{
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: right;
   list-style-type: none;
   font-family: 'Rubik';
   font-size: 16px;
-  margin-bottom: -10px;
+  margin-bottom: 0px;
 }
 
 .text-black{
   color: black;
+  margin-right: 5px;
 }
 
 
