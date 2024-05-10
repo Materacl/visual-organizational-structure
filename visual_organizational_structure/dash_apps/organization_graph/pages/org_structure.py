@@ -29,7 +29,6 @@ def layout(dashboard_id=None):
     else:
         graph_elements = []
         state = True
-
     return html.Div(
         [
             dcc.Store(id="dashboard-data",

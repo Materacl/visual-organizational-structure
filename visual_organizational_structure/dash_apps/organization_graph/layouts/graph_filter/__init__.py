@@ -3,7 +3,6 @@ import json
 import dash_bootstrap_components as dbc
 from dash import html, Input, Output, State, callback, dcc, ctx
 from dash.exceptions import PreventUpdate
-from dash_cytoscape.utils import Tree
 from visual_organizational_structure.models import Dashboard
 
 
@@ -49,7 +48,7 @@ def get_filter_options(filter_clicks, current_options, filter_window_is_open, da
         dashboard = Dashboard.query.get(dashboard_data['dashboard_id'])
         graph_elements = json.loads(dashboard.graph_no_filter_data)
         options = []
-        for v, element in enumerate(graph_elements):
+        for element in graph_elements:
             if 'label' in element['data']:
                 options.append({'label': element['data']['label'], 'value': element['data']['id']})
         return options

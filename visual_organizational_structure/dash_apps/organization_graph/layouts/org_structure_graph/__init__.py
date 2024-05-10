@@ -1,10 +1,10 @@
 import json
-
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 from dash import dcc, html, callback, Input, Output, ctx, State
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
+import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from visual_organizational_structure import db
 
@@ -28,7 +28,6 @@ stylesheet = [
         }
     },
 ]
-
 
 def get_tree_graph(graph_elements=None, roots=None):
     """
@@ -74,31 +73,31 @@ node_info_collapse = dbc.Collapse(
     style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
 )
 
+last_node_timestamp = ''
+
 
 @callback(
     [Output('cytoscape-org-graph', 'elements'),
      Output('cytoscape-org-graph', 'layout'),
      Output('filter-info-text', 'children')],
-    [Input("dashboard-data", 'data'),
+    [Input('uploader-element', 'contents'),
+     Input("dashboard-data", 'data'),
      Input('confirm-csv-uploader', 'n_clicks'),
      Input('confirm-filter', 'n_clicks'),
-     Input('filter-dropdown', 'value')],
+     Input('filter-dropdown', 'value'),
+     Input('cytoscape-org-graph', 'tapNodeData')],
     [State('cytoscape-org-graph', 'elements'),
      State('cytoscape-org-graph', 'layout')]
 )
-def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, current_elements, current_layout):
+def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_clicks, filter_value, tap_node_data,
+                 current_elements,
+                 current_layout):
+    global last_node_timestamp
+
     if "confirm-csv-uploader" == ctx.triggered_id:
-        dashboard = Dashboard.query.get(dashboard_data['dashboard_id'])
-        if dashboard.graph_data:
-            graph_elements = json.loads(dashboard.graph_data)
-            if graph_elements is None:
-                raise PreventUpdate
-            elif len(graph_elements) > 100:
-                current_layout['roots'] = '[id = "MAIN"]'
-                return [], current_layout, ''
-            else:
-                current_layout['roots'] = '[id = "MAIN"]'
-                return graph_elements, current_layout, ''
+        graph_elements = csv_uploader.get_data_from_scv(uploader_contents, dashboard_data)
+        if graph_elements:
+            return graph_elements, current_layout, ''
         else:
             raise PreventUpdate
     elif 'confirm-filter' == ctx.triggered_id:
@@ -106,7 +105,7 @@ def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, cu
         decoded = dashboard.raw_data
         graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
         graph_elements = graph_tree.find_by_id(filter_value, method='bfs').get_elements()
-        if len(graph_elements) > 100:
+        if len(graph_elements) > 200:
             return current_elements, current_layout, 'Слишком большой граф, выберите другой элемент!'
         else:
             dashboard.graph_data = json.dumps(graph_elements)
@@ -115,5 +114,28 @@ def update_graph(dashboard_data, confirm_clicks, filter_clicks, filter_value, cu
             db.session.commit()
             current_layout['roots'] = roots
             return graph_elements, current_layout, ''
+    elif tap_node_data and last_node_timestamp != tap_node_data.get('timestamp', None):
+        last_node_timestamp = tap_node_data.get('timestamp', None)
+        dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+        decoded = dashboard.raw_data
+        graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+        tap_tree = graph_tree.find_by_id(tap_node_data['id'], method='bfs')
+        graph_elements = tap_tree.get_elements(recursion=False)
+        current_elements = json.loads(dashboard.graph_data)
+        if tap_tree.is_leaf():
+            raise PreventUpdate
+        elif all(graph_element in current_elements for graph_element in graph_elements):
+            graph_elements = tap_tree.get_elements()
+            graph_elements.pop(0)
+            new_graph_elements = [current_element for current_element in current_elements if
+                                  current_element not in graph_elements]
+            dashboard.graph_data = json.dumps(new_graph_elements)
+            db.session.commit()
+            return new_graph_elements, current_layout, ''
+        else:
+            dashboard.graph_data = json.dumps(current_elements + graph_elements)
+            db.session.commit()
+            return current_elements + graph_elements, current_layout, ''
     else:
         raise PreventUpdate
+

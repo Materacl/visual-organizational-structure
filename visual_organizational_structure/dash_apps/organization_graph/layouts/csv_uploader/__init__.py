@@ -94,37 +94,23 @@ def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashbo
         return dashboard_data['state'], dashboard_data
 
 
-@callback(
-    Output('graph-filter-window', 'is_open'),
-    [Input('uploader-element', 'contents'),
-     Input('confirm-csv-uploader', 'n_clicks'),
-     Input('filter-csv-btn', 'n_clicks'),
-     Input("dashboard-data", 'data')],
-)
-def update_graph_from_csv(contents, confirm_clicks, filter_clicks, dashboard_data):
-    if "confirm-csv-uploader" == ctx.triggered_id:
-        if contents is None:
-            raise PreventUpdate
+def get_data_from_scv(contents, dashboard_data):
+    if contents is None:
+        raise PreventUpdate
 
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string).decode('utf-8')
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string).decode('utf-8')
 
-        try:
-            graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
-            elements = graph_tree.get_elements()
-            dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-            dashboard.graph_data = json.dumps(elements)
-            dashboard.graph_no_filter_data = json.dumps(elements)
-            dashboard.raw_data = decoded
-            db.session.commit()
-            if len(elements) > 100:
-                return True
-            else:
-                return False
-        except Exception as e:
-            print(e)
-            return dbc.Alert("There was an error processing the file.", color="danger")
-    elif 'filter-csv-btn' == ctx.triggered_id:
-        return True
-    else:
-        return False
+    try:
+        graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+        elements = graph_tree.find_by_id('MAIN', method='bfs').get_elements(recursion=False)
+        dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+        dashboard.graph_data = json.dumps(elements)
+        dashboard.graph_no_filter_data = json.dumps(elements)
+        dashboard.raw_data = decoded
+        dashboard.graph_roots = '[id = "MAIN"]'
+        db.session.commit()
+        return elements
+    except Exception as e:
+        print(e)
+        return dbc.Alert("There was an error processing the file.", color="danger")
