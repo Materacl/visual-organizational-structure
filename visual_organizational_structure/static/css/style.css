@@ -423,12 +423,19 @@ article>span:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  top: 40%;
+  left: auto;
+  text-align: center;
 }
 
 .dash-create-text {
   color: white;
-  font-size: 24px;
+  font-size: 30px;
   text-decoration: none;
+  position: relative;
+  top:35%;
+  text-align: center;
 }
 
 .create-dashboard-form{
@@ -473,15 +480,13 @@ article>span:hover {
 
 .btn-dash{
   display: block;
-  width: 140px;
-  height: 40px;
-  line-height: 40px;
-  font-size: 14px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
   font-family: 'Rubick';
   text-decoration: none;
-  background-color: #ffffff;
+  background: none;
   color: #000000;
-  border: 2px inset #000000;
   letter-spacing: 2px;
   text-align: center;
   position: relative;
@@ -489,9 +494,7 @@ article>span:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 8px;
-  border-width: 2px;
-  border-color: white;
+  border-style: none;
 }
 
 .btn-dash span{
@@ -508,6 +511,7 @@ article>span:hover {
   height: 100%;
   background: #ce224a;
   transition: all .35s;
+  border-radius: 5px;
 }
 
 .btn-dash:hover{
@@ -520,6 +524,12 @@ article>span:hover {
 
 .btn-form-dash{
   background-color: white;
+}
+
+.btn-dash-low{
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 
@@ -632,6 +642,7 @@ article>span:hover {
 }
 
 .a2 {
+
   animation-delay: 2.1s;
 }
 

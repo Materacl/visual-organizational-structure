@@ -13,7 +13,7 @@
                         <img src="#" alt="" class="dash">
                         <p class="dash-text">{{ dashboard.name }}</p>
                         <form action="/delete_dashboard/{{ dashboard.id }}" method="post" class="btn-dash-low">
-                            <button type="submit" class="btn-dash"><span>Удалить доску</span></button>
+                            <button type="submit" class="btn-dash"><span>X</span></button>
                         </form>
                     </figure>
                 </a>
@@ -33,7 +33,7 @@
                 <form class="" id="create-dashboard-form" action="/create_dashboard" method="post"
                     style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
                     <div class="form">
-                            <input type="text" name="name" class="form-field" placeholder="Имя доски">
+                            <input type="text" name="name" class="form-field" placeholder="Имя доски" maxlength="14">
                             <button type="submit" value="Создать" class ='btn-form-dash'>Создать</button>
                     </div>
             </div>
