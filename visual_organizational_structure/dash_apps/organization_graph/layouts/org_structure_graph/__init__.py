@@ -75,7 +75,7 @@ node_info_collapse = dbc.Collapse(
 )
 
 last_node_timestamp = ''
-g_graph_tree = None
+graph_tree_index = None
 
 @callback(
     [Output('cytoscape-org-graph', 'elements'),
@@ -94,7 +94,7 @@ def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_click
                  current_elements,
                  current_layout):
     global last_node_timestamp
-    global g_graph_tree
+    global graph_tree_index
 
     if "confirm-csv-uploader" == ctx.triggered_id:
         return handle_csv_uploader(uploader_contents, dashboard_data, current_layout)
@@ -110,10 +110,10 @@ def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_click
 
 
 def handle_csv_uploader(uploader_contents, dashboard_data, current_layout):
-    global g_graph_tree
+    global graph_tree_index
     graph_elements, graph_tree = csv_uploader.get_data_from_scv(uploader_contents, dashboard_data)
     if graph_elements:
-        g_graph_tree = graph_tree
+        graph_tree_index = graph_tree.create_index()
         return graph_elements, current_layout, ''
     else:
         raise PreventUpdate
@@ -137,15 +137,15 @@ def handle_filter_confirmation(dashboard_data, filter_value, current_layout, cur
 
 def handle_tap_node(tap_node_data, dashboard_data, current_elements, current_layout):
     global last_node_timestamp
-    global g_graph_tree
+    global graph_tree_index
     last_node_timestamp = tap_node_data.get('timeStamp', None)
     dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
 
-    if g_graph_tree is None:
+    if graph_tree_index is None:
         decoded = dashboard.raw_data
-        g_graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+        graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
 
-    tap_tree = g_graph_tree.find_by_id(tap_node_data['id'], method='bfs')
+    tap_tree = graph_tree_index[tap_node_data['id']]
     graph_elements = tap_tree.get_elements(recursion=False)
     current_elements = json.loads(dashboard.graph_data)
     if tap_tree.is_leaf():
