@@ -77,65 +77,64 @@ node_info_collapse = dbc.Collapse(
 last_node_timestamp = ''
 graph_tree_index = None
 
+
 @callback(
-    [Output('cytoscape-org-graph', 'elements'),
-     Output('cytoscape-org-graph', 'layout'),
-     Output('filter-info-text', 'children')],
+    Output('cytoscape-org-graph', 'elements'),
     [Input('uploader-element', 'contents'),
      Input("dashboard-data", 'data'),
-     Input('confirm-csv-uploader', 'n_clicks'),
-     Input('confirm-filter', 'n_clicks'),
-     Input('filter-dropdown', 'value'),
+     Input('search-input', 'value'),
+     Input('search-confirm', 'n_clicks'),
      Input('cytoscape-org-graph', 'tapNodeData')],
-    [State('cytoscape-org-graph', 'elements'),
-     State('cytoscape-org-graph', 'layout')]
+    State('cytoscape-org-graph', 'elements')
 )
-def update_graph(uploader_contents, dashboard_data, confirm_clicks, filter_clicks, filter_value, tap_node_data,
-                 current_elements,
-                 current_layout):
+def update_graph(uploader_contents, dashboard_data, search_value, search_clicks, tap_node_data,
+                 current_elements):
     global last_node_timestamp
     global graph_tree_index
 
     if "confirm-csv-uploader" == ctx.triggered_id:
-        return handle_csv_uploader(uploader_contents, dashboard_data, current_layout)
+        return handle_csv_uploader(uploader_contents, dashboard_data)
 
-    elif 'confirm-filter' == ctx.triggered_id:
-        return handle_filter_confirmation(dashboard_data, filter_value, current_layout, current_elements)
+    elif 'search-confirm' == ctx.triggered_id:
+        return handle_search(search_value, dashboard_data, current_elements)
 
     elif tap_node_data and last_node_timestamp != tap_node_data.get('timeStamp', None):
-        return handle_tap_node(tap_node_data, dashboard_data, current_elements, current_layout)
+        return handle_tap_node(tap_node_data, dashboard_data, current_elements)
 
     else:
         raise PreventUpdate
 
 
-def handle_csv_uploader(uploader_contents, dashboard_data, current_layout):
+def handle_csv_uploader(uploader_contents, dashboard_data):
     global graph_tree_index
     graph_elements, graph_tree = csv_uploader.get_data_from_scv(uploader_contents, dashboard_data)
     if graph_elements:
         graph_tree_index = graph_tree.create_index()
-        return graph_elements, current_layout, ''
+        return graph_elements
     else:
         raise PreventUpdate
 
 
-def handle_filter_confirmation(dashboard_data, filter_value, current_layout, current_elements):
+def handle_search(search_value, dashboard_data, current_elements):
+    global graph_tree_index
     dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-    decoded = dashboard.raw_data
-    graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
-    graph_elements = graph_tree.find_by_id(filter_value, method='bfs').get_elements()
-    if len(graph_elements) > 200:
-        return current_elements, current_layout, 'Слишком большой граф, выберите другой элемент!'
-    else:
-        dashboard.graph_data = json.dumps(graph_elements)
-        roots = f'[id = "{filter_value}"]'
-        dashboard.graph_roots = roots
+    if graph_tree_index is None:
+        decoded = dashboard.raw_data
+        graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
+
+    search_tree = graph_tree_index.get(search_value, None)
+    elements = []
+    while search_tree is not None:
+        elements.extend(search_tree.get_elements(recursion=False))
+        search_tree = search_tree.parent
+
+    if elements:
+        dashboard.graph_data = json.dumps(elements)
         db.session.commit()
-        current_layout['roots'] = roots
-        return graph_elements, current_layout, ''
+    return elements
 
 
-def handle_tap_node(tap_node_data, dashboard_data, current_elements, current_layout):
+def handle_tap_node(tap_node_data, dashboard_data, current_elements):
     global last_node_timestamp
     global graph_tree_index
     last_node_timestamp = tap_node_data.get('timeStamp', None)
@@ -145,6 +144,7 @@ def handle_tap_node(tap_node_data, dashboard_data, current_elements, current_lay
         decoded = dashboard.raw_data
         graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
 
+    print(tap_node_data)
     tap_tree = graph_tree_index[tap_node_data['id']]
     graph_elements = tap_tree.get_elements(recursion=False)
     current_elements = json.loads(dashboard.graph_data)
@@ -157,9 +157,8 @@ def handle_tap_node(tap_node_data, dashboard_data, current_elements, current_lay
                               current_element not in graph_elements]
         dashboard.graph_data = json.dumps(new_graph_elements)
         db.session.commit()
-        return new_graph_elements, current_layout, ''
+        return new_graph_elements
     else:
         dashboard.graph_data = json.dumps(current_elements + graph_elements)
         db.session.commit()
-        return current_elements + graph_elements, current_layout, ''
-
+        return current_elements + graph_elements

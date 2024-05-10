@@ -1,12 +1,13 @@
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph as org_structure_graph
-import visual_organizational_structure.dash_apps.organization_graph.layouts.menu_buttons as menu_buttons
+import visual_organizational_structure.dash_apps.organization_graph.layouts.menu as menu
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
-import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_filter as graph_filter
+import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_search as graph_search
 from dash import html, dcc
 import dash
 import json
+import dash_bootstrap_components as dbc
 
 # Register the Dash app page
 dash.register_page(
@@ -18,7 +19,6 @@ dash.register_page(
 
 
 def layout(dashboard_id=None):
-    global graph_tree
     dashboard = Dashboard.query.get(dashboard_id)
 
     if not dashboard or dashboard.user_id != current_user.id:
@@ -36,8 +36,9 @@ def layout(dashboard_id=None):
                       data={"state": state, "dashboard_id": dashboard_id}),
             org_structure_graph.get_tree_graph(graph_elements, roots=dashboard.graph_roots),
             csv_uploader.csv_uploader(state),
-            graph_filter.filter_chooser(),
-            menu_buttons.dashboard_menu_buttons,
+            graph_search.filter_chooser(),
+            menu.dashboard_menu_buttons,
+            menu.search_bar,
             org_structure_graph.node_info_collapse
         ]
     )

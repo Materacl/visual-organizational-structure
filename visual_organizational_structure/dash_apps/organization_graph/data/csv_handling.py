@@ -13,6 +13,7 @@ class Tree(object):
             props=None,
             edge_data=None,
             edge_props=None,
+            parent=None,
     ):
         """
         A class to facilitate tree manipulation in Cytoscape.
@@ -42,6 +43,7 @@ class Tree(object):
         self.props = props
         self.edge_data = edge_data
         self.edge_props = edge_props
+        self.parent = parent
         self.index = {}
 
     def _dfs(self, search_id):
@@ -78,7 +80,7 @@ class Tree(object):
         """
         return not self.children
 
-    def add_children(self, children):
+    def add_children(self, children: list):
         """
         Add one or more children to the current children of a Tree.
         :param children: List of Tree objects (one object or more)
@@ -252,7 +254,7 @@ class CSVHandler(Tree):
                 parent_path = tuple(filter(lambda x: x != "", full_path[:element_num - 1]))
                 parent_id = paths[parent_path]
                 parent_node = self.find_by_id(parent_id)
-                parent_node.children.append(Tree(element_id, data={'label': element_path[-1]}))
+                parent_node.children.append(Tree(element_id, data={'label': element_path[-1]}, parent=parent_node))
 
         def create_children_employee(full_path: list, employee_data: list) -> None:
             """
@@ -269,7 +271,7 @@ class CSVHandler(Tree):
             parent_id = paths[parent_path]
             parent_node = self.find_by_id(parent_id)
             parent_node.children.append(Tree(employee_data[0], data={
-                'label': employee_data[2], 'job_title': employee_data[1], 'job_type': employee_data[3]}))
+                'label': employee_data[2], 'job_title': employee_data[1], 'job_type': employee_data[3]}, parent=parent_node))
 
         for _, row in df.iterrows():
             path = row[["ЮЛ", "Локация", "Подразделение", "Отдел", "Группа"]].tolist()

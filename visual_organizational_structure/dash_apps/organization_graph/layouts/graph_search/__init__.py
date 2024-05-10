@@ -37,6 +37,18 @@ def filter_chooser(state: bool = False) -> dbc.Modal:
 
 
 @callback(
+    Output("output", "children"),
+    [Input('search-input', 'value'),
+     Input('search-confirm', 'n_clicks')],
+)
+def listen_search(input, search_clicks):
+    if search_clicks:
+        return input
+    else:
+        raise PreventUpdate
+
+
+@callback(
     Output('filter-dropdown', 'options'),
     [Input('filter-csv-btn', 'n_clicks'),
      Input('filter-dropdown', 'options'),

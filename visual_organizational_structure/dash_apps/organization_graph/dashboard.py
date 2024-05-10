@@ -31,7 +31,7 @@ def init_dashboard(server):
                 ],
                 href='/', style={
                     'position': 'absolute',
-                    'top': '25px',
+                    'top': '30px',
                     'left': '15px',
                     'transform': 'translateY(-50%)'
                 }
