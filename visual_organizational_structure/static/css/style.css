@@ -410,8 +410,24 @@ article>span:hover {
   flex-wrap: wrap;
 }
 
+.dash-delete-btn {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
 .dash-card {
   display: flex;
+}
+.delete-btn-flex{
+  display: flex;
+  flex-direction: row;
+}
+
+.cancel-delete{
+  color: white;
 }
 
 .dash-text {
@@ -522,14 +538,23 @@ article>span:hover {
   width: 100%;
 }
 
-.btn-form-dash{
-  background-color: white;
-}
+
 
 .btn-dash-low{
   position: absolute;
   right: 0;
   top: 0;
+}
+
+.dash-delete-btn{
+  width: 150px;
+  height: 110px;
+  border-radius: 6%;
+}
+
+.form-delete-d{
+  display: flex;
+  flex-direction: row;
 }
 
 
@@ -583,6 +608,7 @@ article>span:hover {
   flex-direction: column;
 }
 
+
 .form>p {
   text-align: right;
 }
@@ -618,6 +644,7 @@ article>span:hover {
   font-family: 'Rubik', sans-serif;
   transition: 1s;
 }
+
 
 
 
