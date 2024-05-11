@@ -106,7 +106,8 @@ def get_data_from_scv(contents, dashboard_data):
         elements = graph_tree.find_by_id('MAIN', method='bfs').get_elements(recursion=False)
         dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
         dashboard.graph_data = json.dumps(elements)
-        dashboard.graph_no_filter_data = json.dumps(elements)
+        converted_paths = {str(key): value for key, value in graph_tree.paths.items()}
+        dashboard.graph_paths = json.dumps(converted_paths)
         dashboard.raw_data = decoded
         dashboard.graph_roots = '[id = "MAIN"]'
         db.session.commit()

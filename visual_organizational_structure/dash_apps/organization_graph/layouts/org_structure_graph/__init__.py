@@ -76,22 +76,23 @@ node_info_collapse = dbc.Collapse(
 
 last_node_timestamp = ''
 graph_tree_index = None
+graph_tree_index_labels = None
 
 
 @callback(
     Output('cytoscape-org-graph', 'elements'),
     [Input('uploader-element', 'contents'),
+     Input("confirm-csv-uploader", 'n_clicks'),
      Input("dashboard-data", 'data'),
      Input('search-input', 'value'),
      Input('search-confirm', 'n_clicks'),
      Input('cytoscape-org-graph', 'tapNodeData')],
     State('cytoscape-org-graph', 'elements')
 )
-def update_graph(uploader_contents, dashboard_data, search_value, search_clicks, tap_node_data,
+def update_graph(uploader_contents, upload_confirm, dashboard_data, search_value, search_clicks, tap_node_data,
                  current_elements):
     global last_node_timestamp
     global graph_tree_index
-
     if "confirm-csv-uploader" == ctx.triggered_id:
         return handle_csv_uploader(uploader_contents, dashboard_data)
 
@@ -107,9 +108,11 @@ def update_graph(uploader_contents, dashboard_data, search_value, search_clicks,
 
 def handle_csv_uploader(uploader_contents, dashboard_data):
     global graph_tree_index
+    global graph_tree_index_labels
     graph_elements, graph_tree = csv_uploader.get_data_from_scv(uploader_contents, dashboard_data)
     if graph_elements:
         graph_tree_index = graph_tree.create_index()
+        graph_tree_index_labels = graph_tree.create_index_with_labels()
         return graph_elements
     else:
         raise PreventUpdate
@@ -117,21 +120,27 @@ def handle_csv_uploader(uploader_contents, dashboard_data):
 
 def handle_search(search_value, dashboard_data, current_elements):
     global graph_tree_index
-    dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-    if graph_tree_index is None:
-        decoded = dashboard.raw_data
-        graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
+    global graph_tree_index_labels
+    if search_value:
+        dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+        if graph_tree_index or graph_tree_index_labels is None:
+            decoded = dashboard.raw_data
+            graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+            graph_tree_index = graph_tree.create_index()
+            graph_tree_index_labels = graph_tree.create_index_with_labels()
 
-    search_tree = graph_tree_index.get(search_value, None)
-    elements = []
-    while search_tree is not None:
-        elements.extend(search_tree.get_elements(recursion=False))
-        search_tree = search_tree.parent
+        search_tree = graph_tree_index.get(search_value, None)
+        elements = []
+        while search_tree is not None:
+            elements.extend(search_tree.get_elements(recursion=False))
+            search_tree = search_tree.parent
 
-    if elements:
-        dashboard.graph_data = json.dumps(elements)
-        db.session.commit()
-    return elements
+        if elements:
+            dashboard.graph_data = json.dumps(elements)
+            db.session.commit()
+        return elements
+    else:
+        raise PreventUpdate
 
 
 def handle_tap_node(tap_node_data, dashboard_data, current_elements):

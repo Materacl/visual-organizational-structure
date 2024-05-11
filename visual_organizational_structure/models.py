@@ -32,7 +32,7 @@ class Dashboard(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     graph_data = db.Column(db.Text, nullable=True)
     raw_data = db.Column(db.Text, nullable=True)
-    graph_no_filter_data = db.Column(db.Text, nullable=True)
+    graph_paths = db.Column(db.Text, nullable=True)
     graph_roots = db.Column(db.Text, nullable=True)
 
 

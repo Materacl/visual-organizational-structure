@@ -36,9 +36,19 @@ def layout(dashboard_id=None):
                       data={"state": state, "dashboard_id": dashboard_id}),
             org_structure_graph.get_tree_graph(graph_elements, roots=dashboard.graph_roots),
             csv_uploader.csv_uploader(state),
-            graph_search.filter_chooser(),
-            menu.dashboard_menu_buttons,
-            menu.search_bar,
+            dbc.Navbar(
+                dbc.Container(
+                    [
+                        dbc.Col(
+                            graph_search.search_bar,
+                        ),
+                        dbc.Col(
+                            menu.dashboard_menu_buttons,
+                        ),
+                    ],
+                    style={'justify-content': 'space_between', 'gap': '15px'}
+                )
+            ),
             org_structure_graph.node_info_collapse
         ]
     )

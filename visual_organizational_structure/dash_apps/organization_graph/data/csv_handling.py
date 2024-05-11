@@ -14,6 +14,7 @@ class Tree(object):
             edge_data=None,
             edge_props=None,
             parent=None,
+            path=None,
     ):
         """
         A class to facilitate tree manipulation in Cytoscape.
@@ -45,6 +46,7 @@ class Tree(object):
         self.edge_props = edge_props
         self.parent = parent
         self.index = {}
+        self.index_labels = {}
 
     def _dfs(self, search_id):
         if self.node_id == search_id:
@@ -178,6 +180,27 @@ class Tree(object):
 
         return self.index
 
+    def create_index_with_labels(self):
+        """
+        Generate the index of a Tree with labels, and set it in place. If there was a previous index, it is
+        erased. This uses a BFS traversal. Please note that when a child is added to the tree,
+        the index is not regenerated. Furthermore, an index assigned to a parent cannot be
+        accessed by its children, and vice-versa.
+        :return: Dictionary mapping node_id to Tree object
+        """
+        stack = deque([self])
+        self.index_labels = {}
+
+        while stack:
+            tree = stack.popleft()
+            self.index_labels[self.data['label']] = tree.node_id
+
+            if not tree.is_leaf():
+                for child in tree.children:
+                    stack.append(child)
+
+        return self.index_labels
+
 
 class CSVHandler(Tree):
     """
@@ -203,6 +226,7 @@ class CSVHandler(Tree):
         """
         super().__init__('MAIN')
         self.data = {'label': company_name}
+        self.paths = None
         self.csv_string = csv_string
         self.content_df = self._create_df_from_csv()
         self._generate_tree_from_csv()
@@ -224,7 +248,7 @@ class CSVHandler(Tree):
         """
         df = self.content_df
 
-        paths = {(): 'MAIN'}
+        self.paths = {(): 'MAIN'}
         ids = {
             "le": 0,
             "l": 0,
@@ -246,13 +270,13 @@ class CSVHandler(Tree):
                 None
             """
             element_path = tuple([path for path in full_path[0:element_num] if path])
-            if element_path not in paths:
+            if element_path not in self.paths:
                 element_id = f"{id_str.upper()}{ids[id_str]}"
-                paths[element_path] = element_id
+                self.paths[element_path] = element_id
                 ids[id_str] += 1
 
                 parent_path = tuple(filter(lambda x: x != "", full_path[:element_num - 1]))
-                parent_id = paths[parent_path]
+                parent_id = self.paths[parent_path]
                 parent_node = self.find_by_id(parent_id)
                 parent_node.children.append(Tree(element_id, data={'label': element_path[-1]}, parent=parent_node))
 
@@ -268,7 +292,7 @@ class CSVHandler(Tree):
                 None
             """
             parent_path = tuple(filter(lambda x: x != "", full_path))
-            parent_id = paths[parent_path]
+            parent_id = self.paths[parent_path]
             parent_node = self.find_by_id(parent_id)
             parent_node.children.append(Tree(employee_data[0], data={
                 'label': employee_data[2], 'job_title': employee_data[1], 'job_type': employee_data[3]}, parent=parent_node))

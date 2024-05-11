@@ -1,3 +1,4 @@
+import ast
 import json
 
 import dash_bootstrap_components as dbc
@@ -5,35 +6,27 @@ from dash import html, Input, Output, State, callback, dcc, ctx
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
 
-
-def filter_chooser(state: bool = False) -> dbc.Modal:
-    return dbc.Modal(
-        [
-            dbc.ModalHeader(dbc.ModalTitle("Фильтрация графа"), close_button=True),
-            dbc.ModalBody(
-                [
-                    dbc.Label("Выберите организационную единицу", html_for="dropdown"),
-                    dbc.Form(
-                        dcc.Dropdown(
-                            id="filter-dropdown",
-                        ),
-                    ),
-                    html.Div(id='filter-info-text', children='', style={'color': 'red'}),
-                ]
+search_bar = dbc.Row(
+    [
+        dbc.Col(
+            dbc.Form(
+                dcc.Dropdown(
+                    placeholder="Search", id='search-input', style={'width': '1000px'}
+                ),
             ),
-            dbc.ModalFooter(
-                dbc.Button(
-                    "Подтвердить",
-                    id="confirm-filter",
-                    className="ms-auto",
-                    n_clicks=0,
-                )
+            width="auto",
+        ),
+        dbc.Col(
+            dbc.Button(
+                html.I(className='bi bi-search', style={'fontSize': '14px'}),
+                color="primary", className="ms-2", n_clicks=0, id='search-confirm'
             ),
-        ],
-        id='graph-filter-window',
-        centered=True,
-        is_open=state
-    )
+            width="auto",
+        ),
+    ],
+    id='search-bar',
+    className="g-0 ms-auto flex-nowrap mt-3 mt-md-0",
+)
 
 
 @callback(
@@ -49,20 +42,24 @@ def listen_search(input, search_clicks):
 
 
 @callback(
-    Output('filter-dropdown', 'options'),
-    [Input('filter-csv-btn', 'n_clicks'),
-     Input('filter-dropdown', 'options'),
-     Input('graph-filter-window', 'is_open')],
-    State('dashboard-data', 'data')
+    Output('search-input', 'options'),
+    Input("confirm-csv-uploader", 'n_clicks'),
+    [State('search-input', 'options'),
+     State("dashboard-data", 'data')],
 )
-def get_filter_options(filter_clicks, current_options, filter_window_is_open, dashboard_data):
-    if 'filter-csv-btn' == ctx.triggered_id or filter_window_is_open:
-        dashboard = Dashboard.query.get(dashboard_data['dashboard_id'])
-        graph_elements = json.loads(dashboard.graph_no_filter_data)
-        options = []
-        for element in graph_elements:
-            if 'label' in element['data']:
-                options.append({'label': element['data']['label'], 'value': element['data']['id']})
-        return options
+def set_search_options(upload_clicks, current_options, dashboard_data):
+    if "confirm-csv-uploader" == ctx.triggered_id or not current_options:
+        return get_options(dashboard_data)
     else:
         raise PreventUpdate
+
+
+def get_options(dashboard_data):
+    dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+    paths = json.loads(dashboard.graph_paths)
+    options = []
+    if paths:
+        for path, path_id in paths.items():
+            path = ast.literal_eval(path)
+            options.append({'label': ' -> '.join(path), 'value': path_id})
+    return options
