@@ -56,10 +56,14 @@ def set_search_options(upload_clicks, current_options, dashboard_data):
 
 def get_options(dashboard_data):
     dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-    paths = json.loads(dashboard.graph_paths)
-    options = []
-    if paths:
-        for path, path_id in paths.items():
-            path = ast.literal_eval(path)
-            options.append({'label': ' -> '.join(path), 'value': path_id})
-    return options
+    if dashboard.graph_paths:
+        paths = json.loads(dashboard.graph_paths)
+        options = []
+        if paths:
+            for path, path_id in paths.items():
+                path = ast.literal_eval(path)
+                if path:
+                    options.append({'label': ' -> '.join(path), 'value': path_id})
+        return options
+    else:
+        return []

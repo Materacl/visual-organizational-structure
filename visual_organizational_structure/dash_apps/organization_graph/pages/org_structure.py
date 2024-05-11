@@ -34,7 +34,7 @@ def layout(dashboard_id=None):
         [
             dcc.Store(id="dashboard-data",
                       data={"state": state, "dashboard_id": dashboard_id}),
-            org_structure_graph.get_tree_graph(graph_elements, roots=dashboard.graph_roots),
+            org_structure_graph.get_tree_graph(graph_elements, roots='[id = "MAIN"]'),
             csv_uploader.csv_uploader(state),
             dbc.Navbar(
                 dbc.Container(

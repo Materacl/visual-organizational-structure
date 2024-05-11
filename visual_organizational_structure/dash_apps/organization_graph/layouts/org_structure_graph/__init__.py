@@ -153,7 +153,6 @@ def handle_tap_node(tap_node_data, dashboard_data, current_elements):
         decoded = dashboard.raw_data
         graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
 
-    print(tap_node_data)
     tap_tree = graph_tree_index[tap_node_data['id']]
     graph_elements = tap_tree.get_elements(recursion=False)
     current_elements = json.loads(dashboard.graph_data)
