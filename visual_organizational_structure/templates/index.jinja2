@@ -12,9 +12,26 @@
                     <figure>
                         <img src="#" alt="" class="dash">
                         <p class="dash-text">{{ dashboard.name }}</p>
-                        <form action="/delete_dashboard/{{ dashboard.id }}" method="post" class="btn-dash-low">
-                            <button type="submit" class="btn-dash"><span>Удалить доску</span></button>
-                        </form>
+
+
+                        <div id="delete-dashboard-card">
+                            <form class="btn-dash-low">
+                                <button type="submit" class="btn-dash" id="show-delete-form-btn"><span>X</span></button>
+                            </form>
+
+                            <form id="delete-dashboard-form" class="dash-delete-btn"
+                                action="/delete_dashboard/{{ dashboard.id }}" method="post"
+                                style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                                <div class="form">
+                                    <a>Вы уверены?</a>
+                                    <span class="form" style="display: flex; flex-direction: row; gap: 10px;">
+                                        <button type="submit" value="Удалить" class='btn-form-dash '>Да</button>
+                                        <button type="button" id="CancelDeleteDash" class='btn-form-dash'><a href="/"
+                                                class="cancel-delete">Отмена</a></button>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
                     </figure>
                 </a>
                 <br />
@@ -33,15 +50,17 @@
                 <form class="" id="create-dashboard-form" action="/create_dashboard" method="post"
                     style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
                     <div class="form">
-                            <input type="text" name="name" class="form-field" placeholder="Имя доски">
-                            <button type="submit" value="Создать" class ='btn-form-dash'>Создать</button>
+                        <input type="text" name="name" class="form-field" placeholder="Имя доски" maxlength="14">
+                        <button type="submit" value="Создать" class='btn-form-dash'>Создать</button>
                     </div>
+                </form>
             </div>
-            </form>
 
+        </span>
+
+    </article>
 </div>
-</span>
-</article>
+
 
 {% else %}
 <p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
@@ -54,6 +73,10 @@
         const showCreateFormBtn = document.getElementById('show-create-form-btn');
         const createDashboardForm = document.getElementById('create-dashboard-form');
         const createDashboardText = document.getElementById('create-dashboard-text');
+
+        const showDeleteFormBtn = document.getElementById('show-delete-form-btn');
+        const DeleteDashboardForm = document.getElementById('delete-dashboard-form');
+        const CancelDeleteDash = document.getElementById('CancelDeleteDash')
 
         showCreateFormBtn.addEventListener('click', function (event) {
             event.preventDefault();  // Prevent the default action of the anchor tag
@@ -75,7 +98,27 @@
                 createDashboardText.textContent = 'Создать доску';
             }
         });
+
+        showDeleteFormBtn.addEventListener('click', function (event) {
+            event.preventDefault();  // Prevent the default action of the anchor tag
+            if (DeleteDashboardForm.style.display === 'none' || !DeleteDashboardForm.style.display) {
+                DeleteDashboardForm.style.display = 'block';
+                DeleteDashboardForm.style.opacity = '1'; // Ensure form is visible
+            } else {
+                DeleteDashboardForm.style.display = 'none';
+                DeleteDashboardForm.style.opacity = '0'; // Hide form
+            }
+        });
+
+        // Close the form when clicked outside of it
+        document.addEventListener('click', function (event) {
+            if (!DeleteDashboardForm.contains(event.target) && !showDeleteFormBtn.contains(event.target)) {
+                DeleteDashboardForm.style.display = 'none';
+                DeleteDashboardForm.style.opacity = '0';
+            }
+        });
     });
+
 </script>
 
 {% endblock %}

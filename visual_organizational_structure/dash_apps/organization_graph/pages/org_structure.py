@@ -1,11 +1,13 @@
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
-from visual_organizational_structure.dash_apps.organization_graph.layouts.graphs import get_tree_graph, node_info_collapse, layout_choose
-from visual_organizational_structure.dash_apps.organization_graph.layouts.misc import show_csv_uploader, dashboard_menu_buttons
+import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph as org_structure_graph
+import visual_organizational_structure.dash_apps.organization_graph.layouts.menu as menu
+import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
+import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_search as graph_search
 from dash import html, dcc
 import dash
 import json
-import visual_organizational_structure.dash_apps.organization_graph.callbacks.org_structure_callbacks
+import dash_bootstrap_components as dbc
 
 # Register the Dash app page
 dash.register_page(
@@ -28,14 +30,26 @@ def layout(dashboard_id=None):
     else:
         graph_elements = []
         state = True
-
     return html.Div(
         [
-            dcc.Store(id="dashboard-data", data={"state": state, "dashboard_id": dashboard_id}),
-            get_tree_graph([], graph_elements),
-            show_csv_uploader(state),
-            dashboard_menu_buttons,
-            node_info_collapse
+            dcc.Store(id="dashboard-data",
+                      data={"state": state, "dashboard_id": dashboard_id}),
+            org_structure_graph.get_tree_graph(graph_elements, roots='[id = "MAIN"]'),
+            csv_uploader.csv_uploader(state),
+            dbc.Navbar(
+                dbc.Container(
+                    [
+                        dbc.Col(
+                            graph_search.search_bar,
+                        ),
+                        dbc.Col(
+                            menu.dashboard_menu_buttons,
+                        ),
+                    ],
+                    style={'justify-content': 'space_between', 'gap': '15px'}
+                )
+            ),
+            org_structure_graph.node_info_collapse
         ]
     )
 
