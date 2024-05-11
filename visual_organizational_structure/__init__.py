@@ -16,7 +16,8 @@ def init_app():
     """Construct core Flask application with embedded Dash app."""
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object('config.Config')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../instance/my_database.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:12345678@localhost:5432/test db'
+        #'sqlite:///../instance/my_database.db'
     app.config['SECRET_KEY'] = 'test_key'
     app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
     app.config['MAIL_PORT'] = 587
