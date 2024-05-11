@@ -35,8 +35,6 @@ def login():
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page or url_for("home"))
-    else:
-        flash('проблема с валидацией')
     return render_template("login.jinja2", title='Login', form=form)
 
 
