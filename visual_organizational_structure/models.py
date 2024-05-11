@@ -8,7 +8,6 @@ from flask import current_app as app
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    login = db.Column(db.String(127), unique=True, nullable=False)
     email = db.Column(db.String(127), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     dashboards = db.relationship('Dashboard', backref='user', lazy=True)

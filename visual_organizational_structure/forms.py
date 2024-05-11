@@ -7,8 +7,6 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from visual_organizational_structure.models import User
 
 
-
-
 class RequestResetForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email("Некорректная почта")])
@@ -23,5 +21,20 @@ class RequestResetForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password', message = 'Пароли не совпадают')])
+                                     validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Сменить пароль')
+
+
+class RegisterForm(FlaskForm):
+    email = StringField('email', validators=[DataRequired(), Email(message='Некорректная почта')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=100, message='Пароль должен быть длиннее 8 символов')])
+    password_retry = PasswordField('Password retry', validators=[DataRequired(), Length(min=8, max=100), EqualTo('password', message='Пароли не совпадают')])
+
+    submit = SubmitField('Регистрация')
+
+
+class LoginForm(FlaskForm):
+    email = StringField('email', validators=[DataRequired(), Email(message='Некорректная почта')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=100, message='Пароль должен быть длиннее 8 символов')])
+
+    submit = SubmitField('Войти')
