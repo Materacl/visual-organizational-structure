@@ -17,13 +17,13 @@ def init_app():
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object('config.Config')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../instance/my_database.db'
-    app.config['SECRET_KEY'] = 'test_key'
-    app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
-    app.config['MAIL_PORT'] = 587
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'dzozefkramber@gmail.com'
-    app.config['MAIL_DEFAULT_SENDER'] = 'dzozefkramber@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'mqheegfsfbcbnltw'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     mail = Mail(app)
     db.init_app(app)
     migrate.init_app(app, db)
