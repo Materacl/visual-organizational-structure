@@ -13,6 +13,15 @@ a {
   /* Remove underlining from all links */
 }
 
+.dash-a-ref:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 
 /*header*/
 header {
@@ -386,6 +395,57 @@ figure:after {
   transition: transform 0.2s;
 }
 
+.delete-dash-form {}
+
+.delete-dash-cancel {
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 3px;
+  margin-top: 10px;
+  color: #000000;
+  letter-spacing: 1px;
+  font-family: 'Rubik', sans-serif;
+  border-color: #000000;
+}
+
+.dash-a-delete:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.delete-dash-cancel>a {
+  color: #000000;
+  font-size: 16px;
+}
+
+.delete-dash-ul {
+  display: inline-flex;
+  list-style: none;
+}
+
+.delete-dash-delete {
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 3px;
+  border-color: #000000;
+  margin-top: 10px;
+  color: #ffffff;
+  background-color: red;
+  letter-spacing: 1px;
+  font-family: 'Rubik', sans-serif;
+  cursor: pointer;
+  font-size: 16px;
+
+}
+
+
+
+
+
 article {
   --hover: 0;
 }
@@ -410,23 +470,18 @@ article>span:hover {
   flex-wrap: wrap;
 }
 
-.dash-delete-btn {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  padding: 10px;
-}
+
 
 .dash-card {
   display: flex;
 }
-.delete-btn-flex{
+
+.delete-btn-flex {
   display: flex;
   flex-direction: row;
 }
 
-.cancel-delete{
+.cancel-delete {
   color: white;
 }
 
@@ -435,7 +490,7 @@ article>span:hover {
   font-size: 58px;
   margin: auto;
   margin-left: 5px;
-  font-style: 'Rubick'; 
+  font-style: 'Rubick';
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -450,13 +505,11 @@ article>span:hover {
   font-size: 30px;
   text-decoration: none;
   position: relative;
-  top:35%;
+  top: 35%;
   text-align: center;
 }
 
-.create-dashboard-form{
-  
-}
+.create-dashboard-form {}
 
 
 .create-dashboard-form {
@@ -480,6 +533,7 @@ article>span:hover {
   display: block;
   pointer-events: none;
   transition: opacity 0.5s;
+
   .btn {
     width: auto;
     max-width: auto;
@@ -487,14 +541,14 @@ article>span:hover {
   }
 }
 
-.wrapper{
+.wrapper {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.btn-dash{
+.btn-dash {
   display: block;
   width: 30px;
   height: 30px;
@@ -513,46 +567,50 @@ article>span:hover {
   border-style: none;
 }
 
-.btn-dash span{
+.btn-dash span {
   position: relative;
   z-index: 2;
 }
 
-.btn-dash:after{
+.btn-dash:after {
   position: absolute;
   content: "";
   top: 0;
   left: 0;
   width: 0;
   height: 100%;
-  background: #ce224a;
   transition: all .35s;
   border-radius: 5px;
 }
 
-.btn-dash:hover{
+.btn-dash:hover {
   color: #fff;
 }
 
-.btn-dash:hover:after{
+.btn-dash:hover:after {
   width: 100%;
 }
 
 
 
-.btn-dash-low{
+.btn-dash-low {
   position: absolute;
   right: 0;
   top: 0;
 }
 
-.dash-delete-btn{
-  width: 150px;
-  height: 110px;
+.dash-delete-btn {
+  position: relative;
+  width: auto;
+  height: auto;
   border-radius: 6%;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1000;
 }
 
-.form-delete-d{
+.form-delete-d {
   display: flex;
   flex-direction: row;
 }
@@ -645,14 +703,20 @@ article>span:hover {
   transition: 1s;
 }
 
+.form-label {
+  margin-bottom: -15px;
+  margin-top: 10px;
+  font-family: 'Rubik', sans-serif;
+
+}
 
 
 
- 
+
 .form>button:hover {
   transform: scale(1.05);
   background: linear-gradient(to right, #de48b5 25%, #0097ff 100%);
-  
+
 }
 
 
@@ -776,7 +840,7 @@ article>span:hover {
 
 /*change password*/
 
-.login-change{
+.login-change {
   display: flex;
   flex-direction: row;
   justify-content: right;
@@ -786,13 +850,7 @@ article>span:hover {
   margin-bottom: 0px;
 }
 
-.text-black{
+.text-black {
   color: black;
   margin-right: 5px;
 }
-
-
-
-
-
-
