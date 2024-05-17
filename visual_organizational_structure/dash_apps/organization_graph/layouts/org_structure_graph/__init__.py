@@ -1,4 +1,6 @@
 import json
+import random
+
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 from dash import dcc, html, callback, Input, Output, ctx, State
@@ -8,24 +10,71 @@ import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from visual_organizational_structure import db
 
-stylesheet = [
+# Load extra layouts
+cyto.load_extra_layouts()
+
+default_stylesheet = [
     {
-        'selector': 'node',  # Style for nodes
-        'style': {
-            'label': 'data(label)',  # Updated to use 'label' from node data
-            'text-valign': 'center',  # Center the text vertically
-            'text-halign': 'center',  # Align the text to the center
-            'text-margin-y': '0px',  # Adjust vertical text margin
-            'text-margin-x': '0px',  # Adjust horizontal text margin
-            'background-color': '#1f77b4',  # Change node color to a blue shade
-            'color': 'white',  # Change text color to white
-            'shape': 'roundrectangle',  # Use roundrectangle shape for nodes
-            'width': 'label',  # Set node width based on label size
-            'height': 'label',  # Set node height based on label size
-            'font-size': '16px',  # Adjust font size
-            'padding': '10px',  # Add padding to node
-            'text-wrap': 'wrap'  # Allow text to wrap within node
+        "selector": "node",
+        "style": {
+            'label': 'data(label)',
+            # Text
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'text-margin-y': '0px',
+            'text-margin-x': '0px',
+            'color': 'black',
+            'font-size': '46px',
+            'padding': '10px',
+            'text-wrap': 'wrap',
+            # Shape
+            'shape': 'roundrectangle',
+            'width': 'label',
+            'height': 'label',
+            "opacity": 1,
+            # Background
+            'background-color': '#1f77b4',
+            "background-opacity": 0,
+            # Border
+            "border-width": "3px",
+            # Outline
+            # "outline-width": "10px",
         }
+    },
+    {
+        "selector": "edge",
+        "style": {
+            "width": 6,
+            "line-style": "solid",
+            "line-cap": "round",
+            "line-fill": "linear-gradient",
+            # Color
+            "line-color": "black",
+            "opacity": 1,
+            "line-gradient-stop-colors": "black gray",
+            "line-gradient-stop-positions": "50%",
+            # Curve Style
+            "curve-style": "taxi",
+            'edge-distances': "node-position",
+            "taxi-direction": "vertical",
+            "taxi-turn": "150px",
+            "taxi-turn-min-distance": "50px",
+            # Arrows
+            "target-arrow-shape": "triangle",
+            "target-arrow-color": "black",
+        },
+    },
+    {
+        "selector": ":selected",
+        "style": {
+            "border-width": 2,
+            "border-color": "black",
+            "border-opacity": 1,
+            "opacity": 1,
+            "label": "data(label)",
+            "color": "black",
+            "z-index": 9999,
+        },
     },
 ]
 
@@ -43,12 +92,27 @@ def get_tree_graph(graph_elements=None, roots=None):
     return cyto.Cytoscape(
         id='cytoscape-org-graph',
         layout={
-            'name': 'breadthfirst',
+            'name': 'dagre',
             'roots': roots,
+            'animate': True,
+            'animationDuration': 100,
+            'responsive': True,
+            'wheelSensitivity': 1,
+            # Dagre
+            'nodeSep': 50,
+            'edgeSep': 10,
+            'rankSep': 200,
+            'rankDir': 'TB',
+            'align': 'DR',
+            'acyclicer': 'greedy',
+            'ranker': 'tight-tree',
+            'spacingFactor': 1,
+            'nodeDimensionsIncludeLabels': True,
         },
         minZoom=0.1,
         maxZoom=5,
         boxSelectionEnabled=True,
+        clearOnUnhover=True,
         responsive=True,
         style={
             'width': '100%',
@@ -58,21 +122,9 @@ def get_tree_graph(graph_elements=None, roots=None):
             'left': 0
         },
         elements=graph_elements,
-        stylesheet=stylesheet
+        stylesheet=default_stylesheet,
     )
 
-
-node_info_collapse = dbc.Collapse(
-    dbc.Card(
-        [
-            dbc.CardHeader("Node Information"),
-            dbc.CardBody(html.Div(id='node-info-content'))
-        ]
-    ),
-    id='node-info-collapse',
-    is_open=False,
-    style={'position': 'fixed', 'top': '10px', 'right': '10px', 'z-index': 1000}
-)
 
 last_node_timestamp = ''
 graph_tree_index = None
@@ -100,7 +152,7 @@ def update_graph(uploader_contents, upload_confirm, dashboard_data, search_value
         return handle_search(search_value, dashboard_data, current_elements)
 
     elif tap_node_data and last_node_timestamp != tap_node_data.get('timeStamp', None):
-        return handle_tap_node(tap_node_data, dashboard_data, current_elements)
+        return handle_tap_node(tap_node_data, dashboard_data)
 
     else:
         raise PreventUpdate
@@ -138,12 +190,15 @@ def handle_search(search_value, dashboard_data, current_elements):
         if elements:
             dashboard.graph_data = json.dumps(elements)
             db.session.commit()
+            for element in elements:
+                element["classes"] = ""
+            elements[0]["selected"] = True
         return elements
     else:
         raise PreventUpdate
 
 
-def handle_tap_node(tap_node_data, dashboard_data, current_elements):
+def handle_tap_node(tap_node_data, dashboard_data):
     global last_node_timestamp
     global graph_tree_index
     last_node_timestamp = tap_node_data.get('timeStamp', None)

@@ -47,9 +47,9 @@ def layout(dashboard_id=None):
                         ),
                     ],
                     style={'justify-content': 'space_between', 'gap': '15px'}
-                )
+                ),
+                color='transparent'
             ),
-            org_structure_graph.node_info_collapse
         ]
     )
 
