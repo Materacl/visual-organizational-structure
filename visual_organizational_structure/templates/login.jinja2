@@ -25,18 +25,18 @@
             <div class="left">
                 <div class="header">
                     <h2>Добро пожаловать</h2>
-                    <h4>Войдите в аккаунт, используя логин и пароль</h4>
+                    <h4>Войдите в аккаунт, используя почту и пароль</h4>
                 </div>
                 <div class="form">
                     {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}
-                        {{field.label() }}
+                        {{field.label(class='form-label') }}
                         {% if field.errors %}
-                            {{ field }}
+                            {{ field(class='form-field') }}
                             {% for error in field.errors %}
                             {{ error }}
                             {% endfor %}
                         {% else %}
-                             {{ field() }}
+                             {{ field(class='form-field') }}
                         {% endif %}
                     {% endfor %}
                      <nav>
@@ -46,7 +46,7 @@
                         </ul>
 
                     </nav>
-                    {{ form.submit() }}
+                    <button type="submit" value="login">Войти</button>
                 </div>
             </div>
             <div class="right"></div>

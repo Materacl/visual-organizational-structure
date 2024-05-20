@@ -8,33 +8,65 @@ from visual_organizational_structure.models import User
 
 
 class RequestResetForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email("Некорректная почта")])
-    submit = SubmitField('Request Password Reset')
+    email = StringField(
+        "Почта", validators=[DataRequired(), Email("Некорректная почта")]
+    )
+    submit = SubmitField("Request Password Reset")
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is None:
-            raise ValidationError('Аккаунта с такой почтой не существует')
+            raise ValidationError("Аккаунта с такой почтой не существует")
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Сменить пароль')
+    password = PasswordField("Пароль", validators=[DataRequired()])
+    confirm_password = PasswordField(
+        "Confirm Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Сменить пароль")
 
 
 class RegisterForm(FlaskForm):
-    email = StringField('email', validators=[DataRequired(), Email(message='Некорректная почта')])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=100, message='Пароль должен быть длиннее 8 символов')])
-    password_retry = PasswordField('Password retry', validators=[DataRequired(), Length(min=8, max=100), EqualTo('password', message='Пароли не совпадают')])
+    email = StringField(
+        "Почта",
+        validators=[DataRequired(), Email(message="Некорректная почта")],
+        render_kw={"placeholder": "example@mail.ru"},
+    )
+    password = PasswordField(
+        "Пароль",
+        validators=[
+            DataRequired(),
+            Length(min=8, max=100, message="Пароль должен быть длиннее 8 символов"),
+        ],
+        render_kw={"placeholder": "Введите пароль"},
+    )
+    password_retry = PasswordField(
+        "Повторите пароль",
+        validators=[
+            DataRequired(),
+            Length(min=8, max=100),
+            EqualTo("password", message="Пароли не совпадают"),
+        ],
+        render_kw={"placeholder": "Повторите пароль"},
+    )
 
-    submit = SubmitField('Регистрация')
+    submit = SubmitField("Регистрация")
 
 
 class LoginForm(FlaskForm):
-    email = StringField('email', validators=[DataRequired(), Email(message='Некорректная почта')])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=100, message='Пароль должен быть длиннее 8 символов')])
+    email = StringField(
+        "Почта",
+        validators=[DataRequired(), Email(message="Некорректная почта")],
+        render_kw={"placeholder": "example@mail.ru"},
+    )
+    password = PasswordField(
+        "Пароль",
+        validators=[
+            DataRequired(),
+            Length(min=8, max=100, message="Пароль должен быть длиннее 8 символов"),
+        ],
+        render_kw={"placeholder": "Введите пароль"},
+    )
 
-    submit = SubmitField('Войти')
+    submit = SubmitField("Войти")
