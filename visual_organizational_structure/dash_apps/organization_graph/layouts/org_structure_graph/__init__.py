@@ -1,5 +1,7 @@
 import json
+import pickle
 import random
+import base64
 
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
@@ -7,76 +9,12 @@ from dash import dcc, html, callback, Input, Output, ctx, State
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
+import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph.style as style
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from visual_organizational_structure import db
 
 # Load extra layouts
 cyto.load_extra_layouts()
-
-default_stylesheet = [
-    {
-        "selector": "node",
-        "style": {
-            'label': 'data(label)',
-            # Text
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'text-margin-y': '0px',
-            'text-margin-x': '0px',
-            'color': 'black',
-            'font-size': '46px',
-            'padding': '10px',
-            'text-wrap': 'wrap',
-            # Shape
-            'shape': 'roundrectangle',
-            'width': 'label',
-            'height': 'label',
-            "opacity": 1,
-            # Background
-            'background-color': '#1f77b4',
-            "background-opacity": 0,
-            # Border
-            "border-width": "3px",
-            # Outline
-            # "outline-width": "10px",
-        }
-    },
-    {
-        "selector": "edge",
-        "style": {
-            "width": 6,
-            "line-style": "solid",
-            "line-cap": "round",
-            "line-fill": "linear-gradient",
-            # Color
-            "line-color": "black",
-            "opacity": 1,
-            "line-gradient-stop-colors": "black gray",
-            "line-gradient-stop-positions": "50%",
-            # Curve Style
-            "curve-style": "taxi",
-            'edge-distances': "node-position",
-            "taxi-direction": "vertical",
-            "taxi-turn": "150px",
-            "taxi-turn-min-distance": "50px",
-            # Arrows
-            "target-arrow-shape": "triangle",
-            "target-arrow-color": "black",
-        },
-    },
-    {
-        "selector": ":selected",
-        "style": {
-            "border-width": 2,
-            "border-color": "black",
-            "border-opacity": 1,
-            "opacity": 1,
-            "label": "data(label)",
-            "color": "black",
-            "z-index": 9999,
-        },
-    },
-]
 
 
 def get_tree_graph(graph_elements=None, roots=None):
@@ -122,106 +60,139 @@ def get_tree_graph(graph_elements=None, roots=None):
             'left': 0
         },
         elements=graph_elements,
-        stylesheet=default_stylesheet,
+        stylesheet=style.default_stylesheet,
     )
-
-
-last_node_timestamp = ''
-graph_tree_index = None
-graph_tree_index_labels = None
 
 
 @callback(
     Output('cytoscape-org-graph', 'elements'),
-    [Input('uploader-element', 'contents'),
-     Input("confirm-csv-uploader", 'n_clicks'),
-     Input("dashboard-data", 'data'),
-     Input('search-input', 'value'),
-     Input('search-confirm', 'n_clicks'),
-     Input('cytoscape-org-graph', 'tapNodeData')],
-    State('cytoscape-org-graph', 'elements')
+    Input('dashboard-graph-data', 'data'),
+    State("dashboard-general-data", 'data')
 )
-def update_graph(uploader_contents, upload_confirm, dashboard_data, search_value, search_clicks, tap_node_data,
-                 current_elements):
-    global last_node_timestamp
-    global graph_tree_index
-    if "confirm-csv-uploader" == ctx.triggered_id:
-        return handle_csv_uploader(uploader_contents, dashboard_data)
-
-    elif 'search-confirm' == ctx.triggered_id:
-        return handle_search(search_value, dashboard_data, current_elements)
-
-    elif tap_node_data and last_node_timestamp != tap_node_data.get('timeStamp', None):
-        return handle_tap_node(tap_node_data, dashboard_data)
-
-    else:
-        raise PreventUpdate
+def update_graph(dashboard_graph_data: dict, dashboard_general_data: dict):
+    elements = dashboard_graph_data.get("graph_elements", [])
+    dashboard = Dashboard.query.get(dashboard_general_data["dashboard_id"])
+    dashboard.graph_data = json.dumps(elements)
+    db.session.commit()
+    return elements
 
 
-def handle_csv_uploader(uploader_contents, dashboard_data):
-    global graph_tree_index
-    global graph_tree_index_labels
-    graph_elements, graph_tree = csv_uploader.get_data_from_scv(uploader_contents, dashboard_data)
+@callback(
+    [
+        Output('dashboard-graph-data', 'data', allow_duplicate=True),
+        Output("uploader-csv", "is_open", allow_duplicate=True)
+    ],
+    Input("confirm-csv-uploader", 'n_clicks'),
+    [
+        State('uploader-element', 'contents'),
+        State("dashboard-general-data", 'data')
+    ],
+    prevent_initial_call=True
+)
+def handle_csv_uploader(upload_confirm_clicks, uploader_contents, dashboard_general_data):
+    graph_elements, graph_tree = csv_uploader.get_data_from_scv(uploader_contents, dashboard_general_data)
     if graph_elements:
-        graph_tree_index = graph_tree.create_index()
-        graph_tree_index_labels = graph_tree.create_index_with_labels()
-        return graph_elements
+        dashboard_graph_data = {
+            "graph_elements": graph_elements,
+            "id_to_data": graph_tree.create_index_with_data(),
+            "id_to_parent": graph_tree.create_index_with_parents(),
+            "id_to_children": graph_tree.create_index_with_ids()
+        }
+        dashboard = Dashboard.query.get(dashboard_general_data["dashboard_id"])
+        dashboard.id_to_data = json.dumps(dashboard_graph_data["id_to_data"])
+        dashboard.id_to_parent = json.dumps(dashboard_graph_data["id_to_parent"])
+        dashboard.id_to_children = json.dumps(dashboard_graph_data["id_to_children"])
+        db.session.commit()
+        return dashboard_graph_data, False
     else:
         raise PreventUpdate
 
 
-def handle_search(search_value, dashboard_data, current_elements):
-    global graph_tree_index
-    global graph_tree_index_labels
+@callback(
+    Output('dashboard-graph-data', 'data', allow_duplicate=True),
+    Input('search-confirm', 'n_clicks'),
+    [
+        State('search-input', 'value'),
+        State('dashboard-graph-data', 'data')
+    ],
+    prevent_initial_call=True
+)
+def handle_search(search_confirm_clicks, search_value, dashboard_graph_data):
     if search_value:
-        dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-        if graph_tree_index or graph_tree_index_labels is None:
-            decoded = dashboard.raw_data
-            graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
-            graph_tree_index = graph_tree.create_index()
-            graph_tree_index_labels = graph_tree.create_index_with_labels()
+        id_to_data = dashboard_graph_data.get("id_to_data", [])
+        id_to_parent = dashboard_graph_data.get("id_to_parent", [])
+        if not id_to_data:
+            raise PreventUpdate
+        else:
+            current_id = search_value
+            search_data = id_to_data.get(current_id, [])
+            elements = []
+            while search_data:
+                elements.extend(search_data)
+                current_id = id_to_parent.get(current_id, '')
+                search_data = id_to_data.get(current_id, [])
 
-        search_tree = graph_tree_index.get(search_value, None)
-        elements = []
-        while search_tree is not None:
-            elements.extend(search_tree.get_elements(recursion=False))
-            search_tree = search_tree.parent
+            if elements:
+                for element in elements:
+                    if "selected" in element:
+                        element["selected"].pop("selected")
+                elements[0]["selected"] = True
 
-        if elements:
-            dashboard.graph_data = json.dumps(elements)
-            db.session.commit()
-            for element in elements:
-                element["classes"] = ""
-            elements[0]["selected"] = True
-        return elements
+            current_elements = dashboard_graph_data["graph_elements"]
+            for current_element in current_elements:
+                if "selected" in current_element:
+                    current_element.pop("selected")
+            dashboard_graph_data["graph_elements"] = current_elements + elements
+            return dashboard_graph_data
     else:
         raise PreventUpdate
 
 
-def handle_tap_node(tap_node_data, dashboard_data):
-    global last_node_timestamp
-    global graph_tree_index
-    last_node_timestamp = tap_node_data.get('timeStamp', None)
-    dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
+@callback(
+    Output('dashboard-graph-data', 'data', allow_duplicate=True),
+    Input('cytoscape-org-graph', 'tapNode'),
+    State('dashboard-graph-data', 'data'),
+    prevent_initial_call=True
+)
+def handle_tap_node(tap_node_data, dashboard_graph_data):
+    id_to_data = dashboard_graph_data.get("id_to_data", [])
+    id_to_children = dashboard_graph_data.get("id_to_children", [])
 
-    if graph_tree_index is None:
-        decoded = dashboard.raw_data
-        graph_tree_index = csv_handling.CSVHandler("Brusnika", decoded).create_index()
-
-    tap_tree = graph_tree_index[tap_node_data['id']]
-    graph_elements = tap_tree.get_elements(recursion=False)
-    current_elements = json.loads(dashboard.graph_data)
-    if tap_tree.is_leaf():
-        raise PreventUpdate
-    elif all(graph_element in current_elements for graph_element in graph_elements):
-        graph_elements = tap_tree.get_elements()
-        graph_elements.pop(0)
-        new_graph_elements = [current_element for current_element in current_elements if
-                              current_element not in graph_elements]
-        dashboard.graph_data = json.dumps(new_graph_elements)
-        db.session.commit()
-        return new_graph_elements
+    tap_elements = id_to_data.get(tap_node_data['data']['id'], [])
+    if tap_elements:
+        current_elements = dashboard_graph_data.get("graph_elements", [])
+        if all(tap_element in current_elements for tap_element in tap_elements):
+            all_tap_children_ids = get_children_ids(tap_node_data['data']['id'], id_to_children)
+            graph_elements = []
+            for all_tap_children_id in all_tap_children_ids:
+                graph_elements.extend(id_to_data[all_tap_children_id])
+            graph_elements.pop(0)
+            new_graph_elements = [current_element for current_element in current_elements if
+                                  current_element not in graph_elements]
+            dashboard_graph_data["graph_elements"] = new_graph_elements
+            return dashboard_graph_data
+        else:
+            if 'job_title' in tap_elements[0]['data']:
+                tap_elements.append(
+                    {
+                        'data': {'label': tap_elements[0]['data']['job_title']}
+                    }
+                )
+            dashboard_graph_data["graph_elements"] = current_elements + tap_elements
+            return dashboard_graph_data
     else:
-        dashboard.graph_data = json.dumps(current_elements + graph_elements)
-        db.session.commit()
-        return current_elements + graph_elements
+        raise PreventUpdate
+
+
+def get_children_ids(start_id: str, id_to_children: dict):
+    result = []
+
+    def dfs(current_id: str):
+        result.append(current_id)
+        if current_id in id_to_children:
+            for child_id in id_to_children[current_id]:
+                dfs(child_id)
+
+    dfs(start_id)
+
+    return result

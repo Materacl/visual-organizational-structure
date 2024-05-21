@@ -2,16 +2,14 @@ import base64
 import json
 
 import dash_bootstrap_components as dbc
-from dash import dcc
-from dash import html, Input, Output, callback, ctx
+from dash import dcc, html, State, Input, Output, callback, ctx
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from visual_organizational_structure.models import Dashboard
 from visual_organizational_structure import db
 
 
-def csv_uploader(state: bool = False) -> dbc.Modal:
-    return dbc.Modal(
+csv_uploader = dbc.Modal(
         [
             dbc.ModalHeader(dbc.ModalTitle("Загрузка CSV файла"), close_button=True),
             dbc.ModalBody([
@@ -59,7 +57,7 @@ def csv_uploader(state: bool = False) -> dbc.Modal:
         ],
         id='uploader-csv',
         centered=True,
-        is_open=state
+        is_open=False
     )
 
 
@@ -76,25 +74,15 @@ def update_scv_file_name(filename):
 
 
 @callback(
-    [Output("uploader-csv", "is_open"),
-     Output("dashboard-data", 'data')],
-    [Input("confirm-csv-uploader", "n_clicks"),
-     Input("upload-csv-btn", "n_clicks"),
-     Input("uploader-element", "filename"),
-     Input("dashboard-data", 'data')],
+    Output("uploader-csv", "is_open", allow_duplicate=True),
+    Input("upload-csv-btn", "n_clicks"),
+    prevent_initial_call=True
 )
-def toggle_csv_uploader(confirm_clicks, open_modal_clicks, filename: str, dashboard_data: dict):
-    if "confirm-csv-uploader" == ctx.triggered_id and filename:
-        dashboard_data['state'] = False
-        return False, dashboard_data
-    elif "upload-csv-btn" == ctx.triggered_id or dashboard_data["state"]:
-        dashboard_data['state'] = True
-        return True, dashboard_data
-    else:
-        return dashboard_data['state'], dashboard_data
+def toggle_csv_uploader(open_uploader_clicks):
+    return True
 
 
-def get_data_from_scv(contents, dashboard_data):
+def get_data_from_scv(contents: str, dashboard_data: dict):
     if contents is None:
         raise PreventUpdate
 
@@ -105,7 +93,6 @@ def get_data_from_scv(contents, dashboard_data):
         graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
         elements = graph_tree.find_by_id('MAIN', method='bfs').get_elements(recursion=False)
         dashboard = Dashboard.query.get(dashboard_data["dashboard_id"])
-        dashboard.graph_data = json.dumps(elements)
         converted_paths = {str(key): value for key, value in graph_tree.paths.items()}
         dashboard.graph_paths = json.dumps(converted_paths)
         dashboard.raw_data = decoded

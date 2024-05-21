@@ -46,7 +46,9 @@ class Tree(object):
         self.edge_props = edge_props
         self.parent = parent
         self.index = {}
-        self.index_labels = {}
+        self.index_with_ids = {}
+        self.index_with_data = {}
+        self.index_with_parent = {}
 
     def _dfs(self, search_id):
         if self.node_id == search_id:
@@ -180,26 +182,72 @@ class Tree(object):
 
         return self.index
 
-    def create_index_with_labels(self):
+    def create_index_with_ids(self):
         """
-        Generate the index of a Tree with labels, and set it in place. If there was a previous index, it is
+        Generate the index of a Tree with children ids, and set it in place. If there was a previous index, it is
         erased. This uses a BFS traversal. Please note that when a child is added to the tree,
         the index is not regenerated. Furthermore, an index assigned to a parent cannot be
         accessed by its children, and vice-versa.
-        :return: Dictionary mapping node_id to Tree object
+        :return: Dictionary mapping node_id to children ids
         """
         stack = deque([self])
-        self.index_labels = {}
+        self.index_with_ids = {}
 
         while stack:
             tree = stack.popleft()
-            self.index_labels[self.data['label']] = tree.node_id
+
+            children_ids = []
+            if not tree.is_leaf():
+                for child in tree.children:
+                    children_ids.append(child.node_id)
+                    stack.append(child)
+
+            self.index_with_ids[tree.node_id] = children_ids
+
+        return self.index_with_ids
+
+    def create_index_with_data(self):
+        """
+        Generate the index of a Tree with data, and set it in place. If there was a previous index, it is
+        erased. This uses a BFS traversal. Please note that when a child is added to the tree,
+        the index is not regenerated. Furthermore, an index assigned to a parent cannot be
+        accessed by its children, and vice-versa.
+        :return: Dictionary mapping node_id to children ids
+        """
+        stack = deque([self])
+        self.index_with_data = {}
+
+        while stack:
+            tree = stack.popleft()
+            self.index_with_data[tree.node_id] = tree.get_elements(recursion=False)
 
             if not tree.is_leaf():
                 for child in tree.children:
                     stack.append(child)
 
-        return self.index_labels
+        return self.index_with_data
+
+    def create_index_with_parents(self):
+        """
+        Generate the index of a Tree with parents, and set it in place. If there was a previous index, it is
+        erased. This uses a BFS traversal. Please note that when a child is added to the tree,
+        the index is not regenerated. Furthermore, an index assigned to a parent cannot be
+        accessed by its children, and vice-versa.
+        :return: Dictionary mapping node_id to parent
+        """
+        stack = deque([self])
+        self.index_with_parent = {}
+
+        while stack:
+            tree = stack.popleft()
+
+            if tree.parent is not None:
+                self.index_with_parent[tree.node_id] = tree.parent.node_id
+            if not tree.is_leaf():
+                for child in tree.children:
+                    stack.append(child)
+
+        return self.index_with_parent
 
 
 class CSVHandler(Tree):
@@ -294,8 +342,18 @@ class CSVHandler(Tree):
             parent_path = tuple(filter(lambda x: x != "", full_path))
             parent_id = self.paths[parent_path]
             parent_node = self.find_by_id(parent_id)
-            parent_node.children.append(Tree(employee_data[0], data={
-                'label': employee_data[2], 'job_title': employee_data[1], 'job_type': employee_data[3]}, parent=parent_node))
+            parent_node.children.append(
+                Tree(
+                    employee_data[0],
+                    data={
+                        'label': employee_data[2],
+                        'job_title': employee_data[1],
+                        'job_type': employee_data[3],
+                        'node_label': f"{employee_data[1]} \n {employee_data[2]}"
+                    },
+                    parent=parent_node,
+                )
+            )
 
         for _, row in df.iterrows():
             path = row[["ЮЛ", "Локация", "Подразделение", "Отдел", "Группа"]].tolist()

@@ -30,28 +30,13 @@ search_bar = dbc.Row(
 
 
 @callback(
-    Output("output", "children"),
-    [Input('search-input', 'value'),
-     Input('search-confirm', 'n_clicks')],
-)
-def listen_search(input, search_clicks):
-    if search_clicks:
-        return input
-    else:
-        raise PreventUpdate
-
-
-@callback(
     Output('search-input', 'options'),
     Input("confirm-csv-uploader", 'n_clicks'),
     [State('search-input', 'options'),
-     State("dashboard-data", 'data')],
+     State("dashboard-general-data", 'data')],
 )
 def set_search_options(upload_clicks, current_options, dashboard_data):
-    if "confirm-csv-uploader" == ctx.triggered_id or not current_options:
-        return get_options(dashboard_data)
-    else:
-        raise PreventUpdate
+    return get_options(dashboard_data)
 
 
 def get_options(dashboard_data):
