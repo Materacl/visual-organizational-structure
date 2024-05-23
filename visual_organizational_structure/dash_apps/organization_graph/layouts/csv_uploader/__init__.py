@@ -1,12 +1,9 @@
 import base64
-import json
 
 import dash_bootstrap_components as dbc
-from dash import dcc, html, State, Input, Output, callback, ctx
+from dash import dcc, html, State, Input, Output, callback
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
-from visual_organizational_structure.models import Dashboard
-from visual_organizational_structure import db
 
 csv_uploader = dbc.Modal(
     [
@@ -89,5 +86,5 @@ def get_data_from_scv(contents: str):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string).decode('utf-8')
 
-    graph_tree = csv_handling.CSVHandler("Brusnika", decoded)
+    graph_tree = csv_handling.CSVHandler(decoded)
     return graph_tree

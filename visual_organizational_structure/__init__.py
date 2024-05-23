@@ -1,42 +1,36 @@
 """Initialize Flask app."""
-import os
+from config import Config
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_migrate import Migrate
-from flask_mail import Mail
 
-db = SQLAlchemy()
-manager = LoginManager()
-migrate = Migrate()
-mail = Mail()
+from visual_organizational_structure.database import db, migrate
+from visual_organizational_structure.utils import manager, mail
 
-def init_app():
-    """Construct core Flask application with embedded Dash app."""
+
+def create_app(config_class=Config):
     app = Flask(__name__, instance_relative_config=False)
-    app.config.from_object('config.Config')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../instance/my_database.db'
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-    app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-    app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-    mail = Mail(app)
+    app.config.from_object(config_class)
     db.init_app(app)
     migrate.init_app(app, db)
     manager.init_app(app)
+    mail.init_app(app)
+
+    from visual_organizational_structure.main import bp as main_bp
+    app.register_blueprint(main_bp)
+
+    from visual_organizational_structure.auth import bp as auth_bp
+    app.register_blueprint(auth_bp)
+
+    from visual_organizational_structure.dashboards import bp as dashboards_bp
+    app.register_blueprint(dashboards_bp)
+
+    from visual_organizational_structure.settings import bp as settings_bp
+    app.register_blueprint(settings_bp)
+
+    from visual_organizational_structure.dash_apps.organization_graph import init_dashboard
+    init_dashboard(app)
 
     with app.app_context():
-        db.create_all()  # Create database tables
+        db.create_all()
 
-        # Import parts of our core Flask app
-        from . import routes
-
-        # Import Dash application
-        from .dash_apps.organization_graph.dashboard import init_dashboard
-        app = init_dashboard(app)
-
-        return app
+    return app

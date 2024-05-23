@@ -1,7 +1,6 @@
 import json
 import dash_cytoscape as cyto
-import dash_bootstrap_components as dbc
-from dash import dcc, html, callback, Input, Output, State
+from dash import callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
