@@ -19,10 +19,16 @@ dash.register_page(
 
 
 def layout(dashboard_id=None):
+    if not dashboard_id:
+        return unauthorized_layout("Invalid dashboard ID")
+
     dashboard = Dashboard.query.get(dashboard_id)
 
-    if not dashboard or dashboard.user_id != current_user.id:
-        return unauthorized_layout()
+    if not dashboard:
+        return unauthorized_layout("Dashboard not found")
+
+    if dashboard.user_id != current_user.id:
+        return unauthorized_layout("This is not your board")
 
     if dashboard.graph_data:
         graph_elements = json.loads(dashboard.graph_data)
@@ -68,9 +74,9 @@ def layout(dashboard_id=None):
     )
 
 
-def unauthorized_layout():
+def unauthorized_layout(message="Unauthorized access"):
     return html.Div(
-        "This is not your board.",
+        message,
         style={
             'display': 'flex',
             'justify-content': 'center',
