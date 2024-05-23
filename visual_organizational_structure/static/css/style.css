@@ -395,7 +395,11 @@ figure:after {
   transition: transform 0.2s;
 }
 
-.delete-dash-form {}
+.delete-dash-form {
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+}
 
 .delete-dash-cancel {
   padding: 12px 10px;

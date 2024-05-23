@@ -17,7 +17,7 @@
 
                     <div id="delete-dashboard-card">
                         <form class="btn-dash-low">
-                            <button type="submit" class="btn-dash" id="show-delete-form-btn"><span>X</span></button>
+                            <button type="button" class="btn-dash" id="show-delete-form-btn"><span>X</span></button>
                         </form>
 
                         <form id="delete-dashboard-form" class="dash-delete-btn"
@@ -56,6 +56,8 @@
                                         class="delete-dash-delete"><span>Да</span></button>
                                 </span>
                             </div>
+
+
                         </form>
                     </div>
                 </figure>
@@ -93,15 +95,24 @@
 </div>
 
 <script>
+    const showDeleteFormBtn = document.querySelectorAll('[id=show-delete-form-btn]');
+    const DeleteDashboardForm = document.querySelectorAll('[id=delete-dashboard-form]');
+    const CancelDeleteDash = document.getElementById('CancelDeleteDash')
+
+
+
+    showDeleteFormBtn.forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            DeleteDashboardForm[index].style.display = 'block';
+        });
+    });
+    
     // JavaScript to toggle the create dashboard form and text
     document.addEventListener('DOMContentLoaded', function () {
         const showCreateFormBtn = document.getElementById('show-create-form-btn');
         const createDashboardForm = document.getElementById('create-dashboard-form');
         const createDashboardText = document.getElementById('create-dashboard-text');
 
-        const showDeleteFormBtn = document.getElementById('show-delete-form-btn');
-        const DeleteDashboardForm = document.getElementById('delete-dashboard-form');
-        const CancelDeleteDash = document.getElementById('CancelDeleteDash')
 
         showCreateFormBtn.addEventListener('click', function (event) {
             event.preventDefault();  // Prevent the default action of the anchor tag
@@ -124,24 +135,7 @@
             }
         });
 
-        showDeleteFormBtn.addEventListener('click', function (event) {
-            event.preventDefault();  // Prevent the default action of the anchor tag
-            if (DeleteDashboardForm.style.display === 'none' || !DeleteDashboardForm.style.display) {
-                DeleteDashboardForm.style.display = 'block';
-                DeleteDashboardForm.style.opacity = '1'; // Ensure form is visible
-            } else {
-                DeleteDashboardForm.style.display = 'none';
-                DeleteDashboardForm.style.opacity = '0'; // Hide form
-            }
-        });
 
-        // Close the form when clicked outside of it
-        document.addEventListener('click', function (event) {
-            if (!DeleteDashboardForm.contains(event.target) && !showDeleteFormBtn.contains(event.target)) {
-                DeleteDashboardForm.style.display = 'none';
-                DeleteDashboardForm.style.opacity = '0';
-            }
-        });
     });
 
 </script>
