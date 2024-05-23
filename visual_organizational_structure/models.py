@@ -43,9 +43,11 @@ class Dashboard(db.Model):
     name = db.Column(db.String(150), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     graph_data = db.Column(db.Text, nullable=True)
-    raw_data = db.Column(db.Text, nullable=True)
     graph_paths = db.Column(db.Text, nullable=True)
     graph_roots = db.Column(db.Text, nullable=True)
+    id_to_data = db.Column(db.Text, nullable=True)
+    id_to_parent = db.Column(db.Text, nullable=True)
+    id_to_children = db.Column(db.Text, nullable=True)
 
 
 @manager.user_loader

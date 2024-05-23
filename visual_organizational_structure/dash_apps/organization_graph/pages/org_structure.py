@@ -1,10 +1,14 @@
+import pickle
+
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph as org_structure_graph
 import visual_organizational_structure.dash_apps.organization_graph.layouts.menu as menu
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
 import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_search as graph_search
+from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from dash import html, dcc
+from dash_cytoscape.utils import Tree
 import dash
 import json
 import dash_bootstrap_components as dbc
@@ -26,16 +30,31 @@ def layout(dashboard_id=None):
 
     if dashboard.graph_data:
         graph_elements = json.loads(dashboard.graph_data)
-        state = False
+        id_to_data = json.loads(dashboard.id_to_data)
+        id_to_parent = json.loads(dashboard.id_to_parent)
+        id_to_children = json.loads(dashboard.id_to_children)
     else:
         graph_elements = []
-        state = True
+        id_to_data = []
+        id_to_parent = []
+        id_to_children = []
+
     return html.Div(
         [
-            dcc.Store(id="dashboard-data",
-                      data={"state": state, "dashboard_id": dashboard_id}),
+            dcc.Store(id="dashboard-general-data",
+                      data={"dashboard_id": dashboard_id},
+                      storage_type='session'),
+            dcc.Store(id="dashboard-graph-data",
+                      data={
+                          "graph_elements": graph_elements,
+                          "graph_id_to_data": id_to_data,
+                          "graph_id_to_parent": id_to_parent,
+                          "id_to_children": id_to_children,
+                      },
+                      storage_type='session'
+                      ),
             org_structure_graph.get_tree_graph(graph_elements, roots='[id = "MAIN"]'),
-            csv_uploader.csv_uploader(state),
+            csv_uploader.csv_uploader,
             dbc.Navbar(
                 dbc.Container(
                     [
@@ -47,9 +66,9 @@ def layout(dashboard_id=None):
                         ),
                     ],
                     style={'justify-content': 'space_between', 'gap': '15px'}
-                )
+                ),
+                color='transparent'
             ),
-            org_structure_graph.node_info_collapse
         ]
     )
 
