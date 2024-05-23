@@ -1,14 +1,10 @@
-import pickle
-
 from flask_login import current_user
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.org_structure_graph as org_structure_graph
 import visual_organizational_structure.dash_apps.organization_graph.layouts.menu as menu
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
 import visual_organizational_structure.dash_apps.organization_graph.layouts.graph_search as graph_search
-from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
 from dash import html, dcc
-from dash_cytoscape.utils import Tree
 import dash
 import json
 import dash_bootstrap_components as dbc
@@ -24,6 +20,7 @@ dash.register_page(
 
 def layout(dashboard_id=None):
     dashboard = Dashboard.query.get(dashboard_id)
+    print(f"!{dashboard_id}")
 
     if not dashboard or dashboard.user_id != current_user.id:
         return unauthorized_layout()
@@ -42,8 +39,7 @@ def layout(dashboard_id=None):
     return html.Div(
         [
             dcc.Store(id="dashboard-general-data",
-                      data={"dashboard_id": dashboard_id},
-                      storage_type='session'),
+                      data={"dashboard_id": dashboard_id},),
             dcc.Store(id="dashboard-graph-data",
                       data={
                           "graph_elements": graph_elements,
