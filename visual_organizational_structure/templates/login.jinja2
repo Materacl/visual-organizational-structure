@@ -8,16 +8,7 @@
 <body class="login-body">
 
 
-    {% for category, message in get_flashed_messages(with_categories=True) %}
-    <label>
-        <input type="checkbox" class="alertCheckbox" autocomplete="off" />
-        <div class="alert error">
-            <span class="alertClose">X</span>
-            <span class="alertText">{{message}}
-                <br class="clear" /></span>
-        </div>
-    </label>
-    {% endfor %}
+   
 
     <form method="POST">
         {{ form.hidden_tag() }}
