@@ -339,7 +339,11 @@ class CSVHandler(Tree):
             Returns:
                 None
             """
-            parent_path = tuple(filter(lambda x: x != "", full_path))
+            cleared_path = list(filter(lambda x: x != "", full_path))
+            parent_path = tuple(cleared_path)
+            cleared_path.append(f"{employee_data[0]}: {employee_data[2]}")
+            cleared_path = tuple(cleared_path)
+            self.paths[cleared_path] = employee_data[0]
             parent_id = self.paths[parent_path]
             parent_node = self.find_by_id(parent_id)
             parent_node.children.append(
@@ -349,7 +353,11 @@ class CSVHandler(Tree):
                         'label': employee_data[2],
                         'job_title': employee_data[1],
                         'job_type': employee_data[3],
-                        'node_label': f"{employee_data[1]} \n {employee_data[2]}"
+                        'node_label': f"{employee_data[1]} \n {employee_data[2]}",
+                        'full_data': f"ID: {employee_data[0]}"
+                                     f"\nСпециальность: {employee_data[1]}"
+                                     f"\nФИО: {employee_data[2]}"
+                                     f"\nТип: {employee_data[3]}"
                     },
                     parent=parent_node,
                 )

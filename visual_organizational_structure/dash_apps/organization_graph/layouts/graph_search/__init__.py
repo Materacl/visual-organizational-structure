@@ -1,5 +1,6 @@
 import ast
 import json
+import time
 
 import dash_bootstrap_components as dbc
 from dash import html, Input, Output, State, callback, dcc, ctx
@@ -23,6 +24,7 @@ search_bar = dbc.Row(
             ),
             width="auto",
         ),
+        dcc.Store(id="search_options", storage_type='session'),
     ],
     id='search-bar',
     className="g-0 ms-auto flex-nowrap mt-3 mt-md-0",
@@ -31,12 +33,21 @@ search_bar = dbc.Row(
 
 @callback(
     Output('search-input', 'options'),
-    Input("confirm-csv-uploader", 'n_clicks'),
-    [State('search-input', 'options'),
-     State("dashboard-general-data", 'data')],
+    Input("search_options", 'data'),
+    prevent_initial_call=True
 )
-def set_search_options(upload_clicks, current_options, dashboard_data):
-    return get_options(dashboard_data)
+def set_search_options(search_options_data):
+    return search_options_data["options"]
+
+
+@callback(
+    Output("search_options", 'data'),
+    Input("confirm-csv-uploader", 'n_clicks'),
+    State("dashboard-general-data", 'data'),
+)
+def get_search_options(upload_clicks, dashboard_data):
+    time.sleep(3)  # Временно
+    return {"options": get_options(dashboard_data)}
 
 
 def get_options(dashboard_data):
