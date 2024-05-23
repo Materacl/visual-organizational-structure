@@ -1,0 +1,5 @@
+from flask import Blueprint
+
+bp = Blueprint('dashboards', __name__, template_folder='templates')
+
+from visual_organizational_structure.dashboards import routes

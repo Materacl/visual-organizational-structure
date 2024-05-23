@@ -264,7 +264,7 @@ class CSVHandler(Tree):
         content_df (pd.DataFrame): The DataFrame generated from the CSV data.
     """
 
-    def __init__(self, company_name: str, csv_string: str) -> None:
+    def __init__(self, csv_string: str, company_name: str = "Company") -> None:
         """
         Initializes the CSVHandler with the company name and CSV data.
 

@@ -3,8 +3,7 @@ import json
 import time
 
 import dash_bootstrap_components as dbc
-from dash import html, Input, Output, State, callback, dcc, ctx
-from dash.exceptions import PreventUpdate
+from dash import html, Input, Output, State, callback, dcc
 from visual_organizational_structure.models import Dashboard
 
 search_bar = dbc.Row(

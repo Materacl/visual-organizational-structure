@@ -1,7 +1,6 @@
 import json
 import dash_cytoscape as cyto
-import dash_bootstrap_components as dbc
-from dash import dcc, html, callback, Input, Output, State
+from dash import callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.models import Dashboard
 import visual_organizational_structure.dash_apps.organization_graph.layouts.csv_uploader as csv_uploader
@@ -96,7 +95,6 @@ def handle_csv_uploader(upload_confirm_clicks, uploader_contents, dashboard_gene
             "id_to_children": graph_tree.create_index_with_ids()
         }
         dashboard = Dashboard.query.get(dashboard_general_data["dashboard_id"])
-        print(dashboard_general_data)
         converted_paths = {str(key): value for key, value in graph_tree.paths.items()}
         dashboard.graph_paths = json.dumps(converted_paths)
         dashboard.graph_roots = '[id = "MAIN"]'

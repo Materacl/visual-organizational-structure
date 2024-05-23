@@ -2,7 +2,8 @@ from flask_login import UserMixin
 import jwt
 import datetime
 
-from visual_organizational_structure import db, manager
+from visual_organizational_structure.database import db
+from visual_organizational_structure.utils import manager
 from flask import current_app as app
 
 
