@@ -1,6 +1,13 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:13
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   app:
     build: .
     ports:
@@ -11,13 +18,6 @@ services:
       - .env.docker
     depends_on:
       - db
-
-  db:
-    image: postgres:13
-    env_file:
-      - .env.docker
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
