@@ -1,9 +1,12 @@
 import base64
 
 import dash_bootstrap_components as dbc
-from dash import dcc, html, State, Input, Output, callback
+from dash import dcc, html, State, Input, Output, callback, clientside_callback
 from dash.exceptions import PreventUpdate
 from visual_organizational_structure.dash_apps.organization_graph.data import csv_handling
+from visual_organizational_structure.utils import cache
+
+TIMEOUT = 60
 
 csv_uploader = dbc.Modal(
     [
@@ -48,6 +51,7 @@ csv_uploader = dbc.Modal(
                 id="confirm-csv-uploader",
                 className="ms-auto",
                 n_clicks=0,
+                disabled=False
             )
         ),
     ],
@@ -57,28 +61,33 @@ csv_uploader = dbc.Modal(
 )
 
 
-@callback(
-    [Output('filename-display-text', 'children'),
-     Output('filename-display', 'is_open')],
+clientside_callback(
+    """
+    function(contents, filename) {
+        return [filename, filename ? {'display': 'block'} : {'display': 'none'}];
+    }
+    """,
+    Output('filename-display-text', 'children'),
+    Output('filename-display', 'style'),
     Input('uploader-element', 'contents'),
     State("uploader-element", "filename"),
+    prevent_initial_call=True
 )
-def update_scv_file_name(contents, filename):
-    if filename:
-        return filename, True
-    else:
-        return filename, False
 
 
-@callback(
-    Output("uploader-csv", "is_open", allow_duplicate=True),
+clientside_callback(
+    """
+    function(openUploaderClicks) {
+        return true;
+    }
+    """,
+    Output("uploader-csv", "is_open"),
     Input("upload-csv-btn", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_csv_uploader(open_uploader_clicks):
-    return True
 
 
+@cache.memoize(timeout=TIMEOUT)
 def get_data_from_scv(contents: str):
     if contents is None:
         raise PreventUpdate

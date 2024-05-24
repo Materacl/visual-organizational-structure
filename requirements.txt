@@ -51,3 +51,5 @@ Werkzeug==3.0.1
 WTForms==3.1.2
 zipp==3.18.1
 gunicorn==22.0.0
+Flask-Caching==2.3.0
+redis==5.0.4

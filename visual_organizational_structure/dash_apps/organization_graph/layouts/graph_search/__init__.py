@@ -45,7 +45,6 @@ def set_search_options(search_options_data):
     State("dashboard-general-data", 'data'),
 )
 def get_search_options(upload_clicks, dashboard_data):
-    time.sleep(3)  # Временно
     return {"options": get_options(dashboard_data)}
 
 
