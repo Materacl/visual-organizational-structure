@@ -24,4 +24,4 @@ ENV FLASK_ENV=development
 EXPOSE 8080
 
 # Run the application
-CMD ["gunicorn", "--workers", "8", "--bind", "0.0.0.0:8080", "wsgi:app"]
+CMD ["gunicorn", "--workers", "5", "--bind", "0.0.0.0:8080", "wsgi:app"]
