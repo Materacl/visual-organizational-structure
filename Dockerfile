@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code into the container
 COPY . .
 
+# Copy the Docker environment variables file
+COPY .env.docker .env
+
 # Set environment variables
 ENV FLASK_APP=visual_organizational_structure
 ENV FLASK_ENV=development
