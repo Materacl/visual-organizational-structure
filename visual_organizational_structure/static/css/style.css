@@ -13,6 +13,15 @@ a {
   /* Remove underlining from all links */
 }
 
+.dash-a-ref:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 
 /*header*/
 header {
@@ -386,6 +395,61 @@ figure:after {
   transition: transform 0.2s;
 }
 
+.delete-dash-form {
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.delete-dash-cancel {
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 3px;
+  margin-top: 10px;
+  color: #000000;
+  letter-spacing: 1px;
+  font-family: 'Rubik', sans-serif;
+  border-color: #000000;
+}
+
+.dash-a-delete:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.delete-dash-cancel>a {
+  color: #000000;
+  font-size: 16px;
+}
+
+.delete-dash-ul {
+  display: inline-flex;
+  list-style: none;
+}
+
+.delete-dash-delete {
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 3px;
+  border-color: #000000;
+  margin-top: 10px;
+  color: #ffffff;
+  background-color: red;
+  letter-spacing: 1px;
+  font-family: 'Rubik', sans-serif;
+  cursor: pointer;
+  font-size: 16px;
+
+}
+
+
+
+
+
 article {
   --hover: 0;
 }
@@ -410,21 +474,47 @@ article>span:hover {
   flex-wrap: wrap;
 }
 
+
+
 .dash-card {
   display: flex;
 }
 
-.dash-text {
+.delete-btn-flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.cancel-delete {
   color: white;
-  font-size: 60px;
+}
+
+.dash-text {
+  color: rgb(255, 255, 255);
+  font-size: 58px;
   margin: auto;
+  margin-left: 5px;
+  font-style: 'Rubick';
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  top: 40%;
+  left: auto;
+  text-align: center;
 }
 
 .dash-create-text {
   color: white;
-  font-size: 24px;
+  font-size: 30px;
   text-decoration: none;
+  position: relative;
+  top: 35%;
+  text-align: center;
 }
+
+.create-dashboard-form {}
+
 
 .create-dashboard-form {
   z-index: 1000;
@@ -434,10 +524,100 @@ article>span:hover {
   padding: 20px;
   /* Add padding */
   border-radius: 8px;
+  border-width: 10px;
+  border-color: #000;
+  margin: 10px;
   /* Add rounded corners */
+  width: 15%;
+  height: 10%;
+}
+
+.confirm-modal {
+  z-index: 1000;
+  display: block;
+  pointer-events: none;
+  transition: opacity 0.5s;
+
+  .btn {
+    width: auto;
+    max-width: auto;
+    margin: auto;
+  }
+}
+
+.wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btn-dash {
+  display: block;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  font-family: 'Rubick';
+  text-decoration: none;
+  background: none;
+  color: #000000;
+  letter-spacing: 2px;
+  text-align: center;
+  position: relative;
+  transition: all .35s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-style: none;
+}
+
+.btn-dash span {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-dash:after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  transition: all .35s;
+  border-radius: 5px;
+}
+
+.btn-dash:hover {
+  color: #fff;
+}
+
+.btn-dash:hover:after {
+  width: 100%;
 }
 
 
+
+.btn-dash-low {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.dash-delete-btn {
+  position: relative;
+  width: auto;
+  height: auto;
+  border-radius: 6%;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.form-delete-d {
+  display: flex;
+  flex-direction: row;
+}
 
 
 /* login-register*/
@@ -490,6 +670,7 @@ article>span:hover {
   flex-direction: column;
 }
 
+
 .form>p {
   text-align: right;
 }
@@ -523,8 +704,27 @@ article>span:hover {
   color: #fff;
   letter-spacing: 1px;
   font-family: 'Rubik', sans-serif;
+  transition: 1s;
 }
 
+.form-label {
+  margin-bottom: -15px;
+  margin-top: 10px;
+  font-family: 'Rubik', sans-serif;
+
+}
+
+
+
+
+.form>button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #de48b5 25%, #0097ff 100%);
+
+}
+
+
+/*animation
 .animation {
   animation-name: move;
   animation-duration: .4s;
@@ -537,6 +737,7 @@ article>span:hover {
 }
 
 .a2 {
+
   animation-delay: 2.1s;
 }
 
@@ -582,6 +783,8 @@ article>span:hover {
     width: 440px;
   }
 }
+
+*/
 
 /*alerts style*/
 
@@ -634,4 +837,24 @@ article>span:hover {
   background-color: #FEE;
   border: 1px solid #EDD;
   color: #A66;
+}
+
+
+
+
+/*change password*/
+
+.login-change {
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  list-style-type: none;
+  font-family: 'Rubik';
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
+.text-black {
+  color: black;
+  margin-right: 5px;
 }

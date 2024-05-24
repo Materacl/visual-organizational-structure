@@ -6,19 +6,11 @@ BASE_DIR = path.abspath(path.dirname(__file__))
 
 class Config:
     """Flask configuration variables."""
-
-    # General Config
-    ENVIRONMENT = environ.get("ENVIRONMENT")
-    FLASK_APP = "main.py"
-    FLASK_DEBUG = environ.get("FLASK_DEBUG")
-    SECRET_KEY = environ.get("SECRET_KEY")
-
-    # Assets
-    LESS_BIN = environ.get("LESS_BIN")
-    ASSETS_DEBUG = environ.get("ASSETS_DEBUG")
-    LESS_RUN_IN_DEBUG = environ.get("LESS_RUN_IN_DEBUG")
-
-    # Static Assets
-    STATIC_FOLDER = "static"
-    TEMPLATES_FOLDER = "layouts"
-    COMPRESSOR_DEBUG = environ.get("COMPRESSOR_DEBUG")
+    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')
+    SECRET_KEY = environ.get('SECRET_KEY')
+    MAIL_SERVER = environ.get('MAIL_SERVER')
+    MAIL_PORT = environ.get('MAIL_PORT')
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = environ.get('MAIL_USERNAME')
+    MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')
+    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')

@@ -8,15 +8,59 @@
         {% for dashboard in current_user.dashboards %}
         <span>
             <div class="dash-card" data-id="{{ dashboard.id }}">
-                <a href="/dashboard/{{ dashboard.id }}">
-                    <figure>
-                        <img src="#" alt="" class="dash">
+                <figure>
+                    <img src="#" alt="" class="dash">
+                    <a href="/dashboard/{{ dashboard.id }}" class="dash-a-ref">
                         <p class="dash-text">{{ dashboard.name }}</p>
-                        <form action="/delete_dashboard/{{ dashboard.id }}" method="post">
-                            <button type="submit">Delete {{ dashboard.name }}</button>
+                    </a>
+
+
+                    <div id="delete-dashboard-card">
+                        <form class="btn-dash-low">
+                            <button type="button" class="btn-dash" id="show-delete-form-btn"><span>X</span></button>
                         </form>
-                    </figure>
-                </a>
+
+                        <form id="delete-dashboard-form" class="dash-delete-btn"
+                            action="/delete_dashboard/{{ dashboard.id }}" method="post"
+                            style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                            <div class="delete-dash-form">
+                                <ul class="delete-dash-ul">
+                                    <li>
+                                        <p style="font-size: 18px;">Вы уверены?</p>
+                                    </li>
+                                    <li>
+                                        <svg fill="none" height="64" viewBox="0 0 64 64" width="64">
+                                            <path
+                                                d="M29 13.5C28.1716 13.5 27.5 14.1716 27.5 15C27.5 15.8284 28.1716 16.5 29 16.5H35C35.8284 16.5 36.5 15.8284 36.5 15C36.5 14.1716 35.8284 13.5 35 13.5H29Z"
+                                                fill="black" />
+                                            <path
+                                                d="M14.5 19C14.5 18.1716 15.1716 17.5 16 17.5H48C48.8284 17.5 49.5 18.1716 49.5 19C49.5 19.8284 48.8284 20.5 48 20.5H16C15.1716 20.5 14.5 19.8284 14.5 19Z"
+                                                fill="black" />
+                                            <path
+                                                d="M17.5 22V44C17.5 47.5899 20.4101 50.5 24 50.5H40C43.5899 50.5 46.5 47.5899 46.5 44V22H43.5V44C43.5 45.933 41.933 47.5 40 47.5H24C22.067 47.5 20.5 45.933 20.5 44V22H17.5Z"
+                                                fill="black" />
+                                            <path
+                                                d="M36 28.5C36.8284 28.5 37.5 29.1716 37.5 30V39C37.5 39.8284 36.8284 40.5 36 40.5C35.1716 40.5 34.5 39.8284 34.5 39V30C34.5 29.1716 35.1716 28.5 36 28.5Z"
+                                                fill="black" />
+                                            <path
+                                                d="M29.5 30C29.5 29.1716 28.8284 28.5 28 28.5C27.1716 28.5 26.5 29.1716 26.5 30V39C26.5 39.8284 27.1716 40.5 28 40.5C28.8284 40.5 29.5 39.8284 29.5 39V30Z"
+                                                fill="black" />
+                                        </svg>
+                                    </li>
+                                </ul>
+                                <span class=""
+                                    style="display: flex; flex-direction: row; gap: 30px; position: relative; left: 17%; margin-top: -30px; margin-bottom: 10px; margin-right:80px;">
+                                    <button type="button" id="CancelDeleteDash" class="delete-dash-cancel"><a href="/"
+                                            class="dash-a-delete">Отмена</a></button>
+                                    <button type="submit" value="Удалить"
+                                        class="delete-dash-delete"><span>Да</span></button>
+                                </span>
+                            </div>
+
+
+                        </form>
+                    </div>
+                </figure>
                 <br />
             </div>
         </span>
@@ -30,26 +74,45 @@
                         <p class="dash-create-text" id="create-dashboard-text">Создать доску</p>
                     </figure>
                 </a>
-                <form class="create-dashboard-form" id="create-dashboard-form" action="/create_dashboard" method="post"
-                    style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                    <input type="text" name="name" placeholder="Dashboard name">
-                    <input type="submit" value="Create Dashboard">
+                <form class="" id="create-dashboard-form" action="/create_dashboard" method="post"
+                    style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+                    <div class="form">
+                        <input type="text" name="name" class="form-field" placeholder="Имя доски" maxlength="14">
+                        <button type="submit" value="Создать" class='btn-form-dash'>Создать</button>
+                    </div>
                 </form>
             </div>
-        </span>
-    </article>
 
-    {% else %}
-    <p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
-    {% endif %}
+        </span>
+
+    </article>
+</div>
+
+
+{% else %}
+<p><a href="/register">Register</a> or <a href="/login">Login</a> to manage your dashboards.</p>
+{% endif %}
 </div>
 
 <script>
+    const showDeleteFormBtn = document.querySelectorAll('[id=show-delete-form-btn]');
+    const DeleteDashboardForm = document.querySelectorAll('[id=delete-dashboard-form]');
+    const CancelDeleteDash = document.getElementById('CancelDeleteDash')
+
+
+
+    showDeleteFormBtn.forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            DeleteDashboardForm[index].style.display = 'block';
+        });
+    });
+    
     // JavaScript to toggle the create dashboard form and text
     document.addEventListener('DOMContentLoaded', function () {
         const showCreateFormBtn = document.getElementById('show-create-form-btn');
         const createDashboardForm = document.getElementById('create-dashboard-form');
         const createDashboardText = document.getElementById('create-dashboard-text');
+
 
         showCreateFormBtn.addEventListener('click', function (event) {
             event.preventDefault();  // Prevent the default action of the anchor tag
@@ -71,7 +134,10 @@
                 createDashboardText.textContent = 'Создать доску';
             }
         });
+
+
     });
+
 </script>
 
 {% endblock %}

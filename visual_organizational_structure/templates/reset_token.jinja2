@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="container">
+        <div class="left">
+            <div class="header">
+                <h2>Смена пароля</h2>
+            </div>
+            <div class="form">
+                {% if form.password.errors %}
+                {{ form.password(class="form-field", placeholder ="Пароль") }}
+                {% for error in form.password.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+                {% else %}
+                {{ form.password(class="form-field", placeholder ="Пароль") }}
+                {% endif %}
+
+                {% if form.confirm_password.errors %}
+                {{ form.confirm_password(class="form-field", placeholder ="Повторите пароль") }}
+                {% for error in form.confirm_password.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+                {% else %}
+                {{ form.confirm_password(class="form-field", placeholder ="Повторите пароль") }}
+                {% endif %}
+                <button type="submit" value="password">Сменить пароль</button>
+            </div>
+        </div>
+    </div>
+</form>

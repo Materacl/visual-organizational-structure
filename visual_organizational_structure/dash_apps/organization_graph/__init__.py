@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html
+from dash import html
 import dash_bootstrap_components as dbc
 
 
@@ -22,7 +22,7 @@ def init_dashboard(server):
     )
 
     # Create Dash Layout
-    dash_app.layout = dbc.Spinner(
+    dash_app.layout = html.Div(
         [
             dash.page_container,
             html.A(
@@ -31,16 +31,13 @@ def init_dashboard(server):
                 ],
                 href='/', style={
                     'position': 'absolute',
-                    'top': '25px',
+                    'top': '30px',
                     'left': '15px',
                     'transform': 'translateY(-50%)'
                 }
             ),
         ],
-        spinner_style={"width": "3rem", "height": "3rem"},
         id='dash-container',
-        color='primary',
-        fullscreen=True
     )
 
     return dash_app.server
