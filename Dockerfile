@@ -23,5 +23,8 @@ ENV FLASK_ENV=development
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
+# Migrate
+CMD ["flask", "db", "upgrade"]
+
 # Run the application
 CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8080", "wsgi:app"]
