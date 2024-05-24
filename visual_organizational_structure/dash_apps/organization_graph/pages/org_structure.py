@@ -45,15 +45,19 @@ def layout(dashboard_id=None):
         [
             dcc.Store(id="dashboard-general-data",
                       data={"dashboard_id": dashboard_id},),
+            dcc.Store(id="dashboard-graph-elements",
+                      data=graph_elements,
+                      storage_type='session'
+                      ),
             dcc.Store(id="dashboard-graph-data",
                       data={
-                          "graph_elements": graph_elements,
                           "graph_id_to_data": id_to_data,
                           "graph_id_to_parent": id_to_parent,
                           "id_to_children": id_to_children,
                       },
                       storage_type='session'
                       ),
+
             org_structure_graph.get_tree_graph(graph_elements, roots='[id = "MAIN"]'),
             csv_uploader.csv_uploader,
             dbc.Navbar(
@@ -70,7 +74,8 @@ def layout(dashboard_id=None):
                 ),
                 color='transparent'
             ),
-        ]
+        ],
+        id="main-wrapper",
     )
 
 

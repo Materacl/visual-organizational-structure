@@ -14,3 +14,5 @@ class Config:
     MAIL_USERNAME = environ.get('MAIL_USERNAME')
     MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')
     MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+    CACHE_TYPE = environ.get('CACHE_TYPE')
+    CACHE_REDIS_URL = environ.get('REDIS_URL')
