@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10-slim
+FROM python:3.10-slim AS base
 
 # Set the working directory in the container
 WORKDIR /app
@@ -19,8 +19,22 @@ COPY .env.docker .env
 # Set environment variables
 ENV FLASK_APP=visual_organizational_structure
 ENV FLASK_ENV=development
+ENV PYTHONPATH=/app
+
+# Create a stage for testing
+FROM base AS test
+
+# Install testing dependencies
+RUN pip install pytest
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Run tests and print output to console
+CMD ["pytest", "/app/tests"]
 
 # Expose port 8080 to the outside world
+FROM base AS final
 EXPOSE 8080
 
 # Run the application

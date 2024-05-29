@@ -21,6 +21,23 @@ services:
       - .:/app
     env_file:
       - .env.docker
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - db
+      - redis
+
+  test:
+    build:
+      context: .
+      target: test
+    command: pytest /app/tests
+    volumes:
+      - .:/app
+    env_file:
+      - .env.docker
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - db
       - redis

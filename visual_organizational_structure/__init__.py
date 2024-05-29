@@ -14,10 +14,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     manager.init_app(app)
     mail.init_app(app)
-    cache.init_app(app, config={
-        'CACHE_TYPE': Config.CACHE_TYPE,
-        'CACHE_REDIS_URL': Config.CACHE_REDIS_URL
-    })
+    cache.init_app(app)
 
     from visual_organizational_structure.main import bp as main_bp
     app.register_blueprint(main_bp)
