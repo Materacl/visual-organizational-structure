@@ -18,7 +18,7 @@ def create_app(config_class=Config):
         'CACHE_TYPE': Config.CACHE_TYPE,
         'CACHE_REDIS_URL': Config.CACHE_REDIS_URL
     })
-
+    
     from visual_organizational_structure.main import bp as main_bp
     app.register_blueprint(main_bp)
 

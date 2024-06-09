@@ -5,7 +5,16 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  background-color: white;
 
+  transition: background-color 0.5s, color 0.5s;
+}
+
+/* Стили для темной темы */
+body.dark-theme {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    transition: background-color 0.5s, color 0.5s;
 }
 
 a {
@@ -119,6 +128,7 @@ header {
   font-size: 20px;
   line-height: 24px;
   background-color: white;
+  transition: background-color 0.5s, color 0.5s;
 }
 
 .register:active {
@@ -174,6 +184,7 @@ header {
   cursor: pointer;
   justify-content: space-between;
   right: 0;
+  transition: background-color 0.5s, color 0.5s;
 }
 
 
@@ -359,7 +370,7 @@ figure {
   width: 500px;
   aspect-ratio: 8 / 5;
   --bg: hsl(330 80% calc(90% - (var(--hover) * 10%)));
-  --accent: hsl(245, 56%, 41%);
+  --accent: hsl(245, 35%, 45%);
   transition: background 0.2s;
   background:
     radial-gradient(circle at top left, var(--accent), transparent 75%),
@@ -413,12 +424,7 @@ figure:after {
 }
 
 .dash-a-delete:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  
 }
 
 .delete-dash-cancel>a {
@@ -617,6 +623,123 @@ article>span:hover {
 .form-delete-d {
   display: flex;
   flex-direction: row;
+}
+
+/*settings*/
+
+.set-a{
+  text-decoration: none;
+  color: black;
+}
+
+.set-p{
+  color: black;
+  margin-left: 25px;
+  padding-top: 10px;
+}
+
+.ball {
+  list-style: none;
+  margin: 0;
+  }
+  .ball a {
+  width: 100%;
+  color: #808285;
+  text-decoration: none;
+  display: inline-block;
+  padding-left: 25px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 20px;
+  position: relative;
+  transition: .3s linear;
+  }
+  .ball a:before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #425273;
+  position: absolute;
+  left: -30px;
+  top: 7px;
+  }
+  .ball li {position: relative;}
+  .ball li:before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #000000;
+  position: absolute;
+  top: 12px;
+  left: -30px;
+  z-index: 2;
+  transition: .4s ease-in-out;
+  }
+  .ball li:hover:before {left: -20px;}
+
+
+  .glow-on-hover {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 60px;
+    height: 50px;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+}
+
+.glow-on-hover:before {
+    content: '';
+    background: linear-gradient(45deg, #000000, #ffffff, #000000, #ffffff, #000000, #ffffff, #000000, #ffffff, #000000);
+    position: absolute;
+    top: -2px;
+    left:-2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    border-radius: 10px;
+}
+
+.glow-on-hover:active {
+    color: #000
+}
+
+.glow-on-hover:active:after {
+    background: transparent;
+}
+
+.glow-on-hover:hover:before {
+    opacity: 1;
+}
+
+.glow-on-hover:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+}
+
+@keyframes glowing {
+    0% { background-position: 0 0; }
+    50% { background-position: 400% 0; }
+    100% { background-position: 0 0; }
 }
 
 

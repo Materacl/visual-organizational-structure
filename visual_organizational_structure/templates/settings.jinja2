@@ -1,8 +1,36 @@
 {% extends "layout.jinja2" %}
 {% block content %}
+<div class="container" style="positio;">
+    <ul class="ball">
+        <li>
+            <a href="/reset_password" data-lang="pass_change" class="set-a">Смена пароля</a>
+        </li>
 
-<div>
-    <a href="/confirm_update_password">Смена пароля</a>
+        <li class="">
+            <p data-lang="lang_change" class="set-p">Смена языка</p>
+            <div style="padding-left: 20px;">
+                <button class="_btn glow-on-hover" data-btn="ru">RU</button>
+                <button class="_btn glow-on-hover" data-btn="en">En</button>
+            </div>
+        </li>
+
+        <li style="margin-top; 20px;">
+            <p data-lang="theme_change" class="set-p">Смена темы</p>
+            <div style="padding-left: 20px;">
+
+                <button class="dark glow-on-hover" data-lang="theme_change_dark">Темная</button>
+                <button class="light glow-on-hover" data-lang="theme_change_ligth">Светлая</button>
+            </div>
+        </li>
+
+    </ul>
 </div>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dark-theme.js') }}"></script>
+
+
+
+
 
 {% endblock %}

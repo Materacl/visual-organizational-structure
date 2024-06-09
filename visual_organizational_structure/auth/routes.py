@@ -48,8 +48,8 @@ def logout():
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
 def request_reset_password():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+   # if current_user.is_authenticated:
+#    return redirect(url_for('main.home'))
     form = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()

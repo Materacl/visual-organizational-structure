@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset='UTF=8'>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -8,7 +9,7 @@
 <body class="login-body">
 
 
-   
+
 
     <form method="POST">
         {{ form.hidden_tag() }}
@@ -20,20 +21,21 @@
                 </div>
                 <div class="form">
                     {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}
-                        {{field.label(class='form-label') }}
-                        {% if field.errors %}
-                            {{ field(class='form-field') }}
-                            {% for error in field.errors %}
-                            {{ error }}
-                            {% endfor %}
-                        {% else %}
-                             {{ field(class='form-field') }}
-                        {% endif %}
+                    {{field.label(class='form-label') }}
+                    {% if field.errors %}
+                    {{ field(class='form-field') }}
+                    {% for error in field.errors %}
+                    {{ error }}
                     {% endfor %}
-                     <nav>
-                        <ul class = 'login-change'>
-                            <li><a href="/register" class = "text-black">Регистрация</a></li>
-                            <li><a href="/reset_password" class = "text-black">Забыл пароль</a></p></li>
+                    {% else %}
+                    {{ field(class='form-field') }}
+                    {% endif %}
+                    {% endfor %}
+                    <nav>
+                        <ul class='login-change'>
+                            <li><a href="/register" class="text-black">Регистрация</a></li>
+                            <li><a href="/reset_password" class="text-black">Забыл пароль</a></p>
+                            </li>
                         </ul>
 
                     </nav>
@@ -43,4 +45,7 @@
             <div class="right"></div>
         </div>
     </form>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
 </html>
